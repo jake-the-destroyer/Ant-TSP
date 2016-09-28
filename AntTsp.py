@@ -45,10 +45,10 @@ class AntTsp:
 
     1 - Take in text file of a matrix. (Done)
     2 - Turn that into a list (Done)
-    3 - Split the list on a space to increase the value of i
-    4 - Split the list on a new line to increase the value of j
-    5 - write the values individually to a 2 D array
-    6 - Return the array as your graph in a matrix of vertices
+    3 - Split the list on a space to increase the value of i (Done)
+    4 - Split the list on a new line to increase the value of j (Done)
+    5 - write the values individually to a 2 D array (Done)
+    6 - Return the array as your graph in a matrix of vertices (Done)
     7 - Thank your grandparents for naming your uncle Bob
 
     '''
@@ -56,21 +56,19 @@ class AntTsp:
     with open(libfile) as f:
       content = f.readlines()
       f.close()
-    print content  
-    split_list = [ 0 for x in range(len(content))]
+    #print content  
+
+    split_list = []
+    i=0
     for term in content:
-      split_list[i] = term.split()
-      print split_list
-    #if matrix == null:
-    w = len(content)
-    matrix = [[0 for x in range(w)] for y in range(w)] 
-    print w
-    for vector in content:
-      if vector:
-        matrix[i][j] = int (vector) + 1
-        j += 1 
-    #print matrix 
-    return content
+      split_list.append(term.split( ))
+
+    for i in range(len(split_list)):
+      for j in range(len(split_list[i])):
+        split_list[i][j] = int(split_list[i][j])
+    print split_list
+    return split_list
+
   '''
     FileReader fr = new FileReader(path)
         BufferedReader buf = new BufferedReader(fr)
