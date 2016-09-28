@@ -1,10 +1,9 @@
 #!/usr/bin/python
 
-'''
-First attempt at the ant algorithm to solve some simple TSP problems.
-
+''' 
+First attempt at the ant algorithm to solve some simple TSP problems.  
 Note: The TSP Matrices are fed in to this program as a full Matrix inthe form of a text file
-      Weights for the matrices are parsed as doubes and therefore must all be >= 0
+Weights for the matrices are parsed as doubes and therefore must all be >= 0
 '''
 
 class AntTsp:
@@ -38,30 +37,39 @@ class AntTsp:
 
 
 
-  def readFile(file):
-'''
-What I need to do;
+  def readFile(libfile):
 
-1 - Take in text file of a matrix.
-2 - Turn that into a list
-3 - Split the list on a space to increase the value of i
-4 - Split the list on a new line to increase the value of j
-5 - write the values individually to a 2 D array
-6 - Return the array as your graph in a matrix of vertices
-7 - Thank your grandparents for naming your uncle Bob
-'''
-    with open('somerandomstuff.txt') as f:
+    '''
+
+    What I need to do;
+
+    1 - Take in text file of a matrix. (Done)
+    2 - Turn that into a list (Done)
+    3 - Split the list on a space to increase the value of i
+    4 - Split the list on a new line to increase the value of j
+    5 - write the values individually to a 2 D array
+    6 - Return the array as your graph in a matrix of vertices
+    7 - Thank your grandparents for naming your uncle Bob
+
+    '''
+    j = 0
+    with open(libfile) as f:
       content = f.readlines()
       f.close()
-    
-    if matrix == null:
-      w = len(content)
-      matrix = [[0 for x in range(w)] for y in range(w)] 
-
+    print content  
+    split_list = [ 0 for x in range(len(content))]
+    for term in content:
+      split_list[i] = term.split()
+      print split_list
+    #if matrix == null:
+    w = len(content)
+    matrix = [[0 for x in range(w)] for y in range(w)] 
+    print w
     for vector in content:
-      if !vector.isEmpty()
-        matrix[i][j++] = vector + 1
-    
+      if vector:
+        matrix[i][j] = int (vector) + 1
+        j += 1 
+    #print matrix 
     return content
   '''
     FileReader fr = new FileReader(path)
@@ -99,3 +107,5 @@ What I need to do;
     }
 
 '''
+
+  readFile('somerandomstuff.txt')
