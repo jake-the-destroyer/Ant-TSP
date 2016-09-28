@@ -7,11 +7,55 @@ Weights for the matrices are parsed as doubes and therefore must all be >= 0
 '''
 
 class AntTsp:
-  #Initialize all class parameters
+
+  #Method to ake ants visit a town and mark the town as being visited.
+  def visit( ant, town ):
+    print "hello"
+
+  #Method for finding the tour length so far of an ant
+  def tourLength( ant ):
+    print "hello"
   
+  def readFile(libfile):
+
+    '''
+    What I need to do;
+
+    1 - Take in text file of a matrix. (Done)
+    2 - Turn that into a list (Done)
+    3 - Split the list on a space to increase the value of i (Done)
+    4 - Split the list on a new line to increase the value of j (Done)
+    5 - write the values individually to a 2 D array (Done)
+    6 - Return the array as your graph in a matrix of vertices (Done)
+    7 - Thank your grandparents for naming your uncle Bob
+    '''
+
+    j = 0
+    with open(libfile) as f:
+      content = f.readlines()
+      f.close()
+
+    split_list = []
+    i=0
+    for term in content:
+      split_list.append(term.split( ))
+
+    for i in range(len(split_list)):
+      for j in range(len(split_list[i])):
+        split_list[i][j] = int(split_list[i][j])
+    #print split_list
+    return split_list
+
+
+
+
+
+
+  #Initialize all class parameters
+
   #Number of generations which, without further optimaity will resut in termination
   # Number of Ants
-  numAnts = 100 
+  num_ants = 100
 
   #Number of Ants per generation for optimization
   numBestAnts = 10
@@ -35,75 +79,25 @@ class AntTsp:
   #Weight of the pheramone of the agorithm
   beta = 0.02
 
+  #Parsed graph
+  full_matrix = readFile('somerandomstuff.txt')
 
-
-  def readFile(libfile):
-
-    '''
-
-    What I need to do;
-
-    1 - Take in text file of a matrix. (Done)
-    2 - Turn that into a list (Done)
-    3 - Split the list on a space to increase the value of i (Done)
-    4 - Split the list on a new line to increase the value of j (Done)
-    5 - write the values individually to a 2 D array (Done)
-    6 - Return the array as your graph in a matrix of vertices (Done)
-    7 - Thank your grandparents for naming your uncle Bob
-
-    '''
-    j = 0
-    with open(libfile) as f:
-      content = f.readlines()
-      f.close()
-    #print content  
-
-    split_list = []
-    i=0
-    for term in content:
-      split_list.append(term.split( ))
-
-    for i in range(len(split_list)):
-      for j in range(len(split_list[i])):
-        split_list[i][j] = int(split_list[i][j])
-    print split_list
-    return split_list
-
+  #2D List of all the ants vs visited towns
+  antvisited = []
+  '''for i in range(1, numAnts):
+    antvisited.append(i)
+    for j in range(1, len(full_matrix[1])):
+      antvisited[i].append(j)
+      antvisited[i][j] = 0 
+  print antvisited
   '''
-    FileReader fr = new FileReader(path)
-        BufferedReader buf = new BufferedReader(fr)
-        String line;
-        int i = 0;
+   
 
-        while ((line = buf.readLine()) != null) {
-            String splitA[] = line.split(" ");
-            LinkedList<String> split = new LinkedList<String>();
-            for (String s : splitA)
-                if (!s.isEmpty())
-                    split.add(s);
+  antvisited = [[0 for x in range(len(full_matrix[1]))] for y in range(num_ants )]
+  print antvisited
 
-            if (graph == null)
-                graph = new double[split.size()][split.size()];
-            int j = 0;
+  print len(antvisited[1])
+  print len(antvisited)
 
-            for (String s : split)
-                if (!s.isEmpty())
-                    graph[i][j++] = Double.parseDouble(s) + 1;
-
-            i++;
-        }
-
-        n = graph.length;
-        m = (int) (n * numAntFactor);
-
-        // all memory allocations done here
-        trails = new double[n][n];
-        probs = new double[n];
-        ants = new Ant[m];
-        for (int j = 0; j < m; j++)
-            ants[j] = new Ant();
-    }
-
-'''
-
-  readFile('somerandomstuff.txt')
+  #2D list of all tours performed by ants
+  anttour = []
