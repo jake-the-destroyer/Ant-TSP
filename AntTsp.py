@@ -46,8 +46,33 @@ class AntTsp:
     #print split_list
     return split_list
 
+  def placeAnts():
+    '''
+    Things I have to do 
+    - Place ants on each city 
+    - Update the ant_visited list with the city index of the city that the ant has been places
+    - Update the ant_tour list in index position 0 with the city that the ant has been placed
+    '''
 
+    print "hello"
 
+  def updateTour( tour_list, city_value ):
+    ''' 
+    - Take in a tour list of a given ant
+    - Add the city_index to the list
+    - Return the newly updated list.
+    '''
+    tour_list.append(city_value)
+    return tour_list
+
+  def updateTaboo( visited_list, city_index ):
+    ''' 
+    - Take in a visited list of a given ant
+    - Flip the bit of the index of the city in ant_visited list 
+    - Return the newly updated list
+    '''
+    visited_list[city_index] = 1
+    return visited_list
 
 
 
@@ -82,22 +107,46 @@ class AntTsp:
   #Parsed graph
   full_matrix = readFile('somerandomstuff.txt')
 
-  #2D List of all the ants vs visited towns
-  antvisited = []
-  '''for i in range(1, numAnts):
-    antvisited.append(i)
-    for j in range(1, len(full_matrix[1])):
-      antvisited[i].append(j)
-      antvisited[i][j] = 0 
-  print antvisited
-  '''
-   
+  #2D List of all the ants vs visited towns, initialized with zeroos
+  ant_visited = [[0 for x in range(len(full_matrix[1]))] for y in range(num_ants )]
 
-  antvisited = [[0 for x in range(len(full_matrix[1]))] for y in range(num_ants )]
-  print antvisited
+  #2D list of all tours performed by ants. all of which are, for now empty.
+  ant_tour = [[] for y in range(num_ants )]
 
-  print len(antvisited[1])
-  print len(antvisited)
 
-  #2D list of all tours performed by ants
-  anttour = []
+
+
+  ant_tour[0] = updateTour( ant_tour[0], 20)
+
+  print ant_tour
+  
+  ant_visited[0] = updateTaboo( ant_visited[0], 2)
+
+  print ant_visited 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
