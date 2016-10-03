@@ -14,8 +14,7 @@ class AntTsp:
 
   #Method for finding the tour length so far of an ant
   def tourLength( ant ):
-    print "hello"
-  
+    
   def readFile(libfile):
 
     '''
@@ -82,8 +81,18 @@ class AntTsp:
     visited_list[city_index] = 1
     return visited_list
 
-  
+  """
+  DO THINGAS LIKE THIS NEXT:
+  """
 
+  def move(ant_taboo, ant_tour):
+    print "hello"
+    ant_index = 0
+    ant_taboo.index(0)
+  
+  def pickNext():
+    print "hello"
+    
   #Initialize all class parameters
 
   #Number of generations which, without further optimaity will resut in termination
@@ -125,25 +134,4 @@ class AntTsp:
 
   print ant_visited
   print ant_tour
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
