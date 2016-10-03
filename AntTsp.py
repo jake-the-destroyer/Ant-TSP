@@ -46,15 +46,23 @@ class AntTsp:
     #print split_list
     return split_list
 
-  def placeAnts():
+  def placeAnts(ant_taboo_list, ant_tour_list):
     '''
     Things I have to do 
     - Place ants on each city 
     - Update the ant_visited list with the city index of the city that the ant has been places
     - Update the ant_tour list in index position 0 with the city that the ant has been placed
     '''
+    city_index = 0
+    ant_index = 0 
 
-    print "hello"
+    for ant in range ( 0, len(ant_taboo_list)):
+      ant_taboo_list[ant_index][city_index] = 1
+      ant_tour_list[ant_index].append(city_index)
+      city_index = (city_index + 1) % (len(ant_taboo_list[0]))
+      ant_index = ant_index + 1 
+      
+    return ant_taboo_list, ant_tour_list
 
   def updateTour( tour_list, city_value ):
     ''' 
@@ -74,7 +82,7 @@ class AntTsp:
     visited_list[city_index] = 1
     return visited_list
 
-
+  
 
   #Initialize all class parameters
 
@@ -113,21 +121,10 @@ class AntTsp:
   #2D list of all tours performed by ants. all of which are, for now empty.
   ant_tour = [[] for y in range(num_ants )]
 
+  ant_visited, ant_tour = placeAnts(ant_visited, ant_tour)
 
-
-
-  ant_tour[0] = updateTour( ant_tour[0], 20)
-
+  print ant_visited
   print ant_tour
-  
-  ant_visited[0] = updateTaboo( ant_visited[0], 2)
-
-  print ant_visited 
-
-
-
-
-
 
 
 
