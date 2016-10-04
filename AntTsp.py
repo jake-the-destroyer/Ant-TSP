@@ -92,7 +92,63 @@ class AntTsp:
   
   def pickNext():
     print "hello"
-    
+
+
+ '''   
+    private void probTo(Ant ant) {
+        int i = ant.tour[currentIndex];
+
+        double denom = 0.0;
+        for (int l = 0; l < n; l++)
+            if (!ant.visited(l))
+                denom += pow(trails[i][l], alpha)
+                        * pow(1.0 / graph[i][l], beta);
+
+
+        for (int j = 0; j < n; j++) {
+            if (ant.visited(j)) {
+                probs[j] = 0.0;
+            } else {
+                double numerator = pow(trails[i][j], alpha)
+                        * pow(1.0 / graph[i][j], beta);
+                probs[j] = numerator / denom;
+            }
+        }
+
+    }
+
+    // Given an ant select the next town based on the probabilities
+    // we assign to each town. With pr probability chooses
+    // totally randomly (taking into account tabu list).
+    private int selectNextTown(Ant ant) {
+        // sometimes just randomly select
+        if (rand.nextDouble() < pr) {
+            int t = rand.nextInt(n - currentIndex); // random town
+            int j = -1;
+            for (int i = 0; i < n; i++) {
+                if (!ant.visited(i))
+                    j++;
+                if (j == t)
+                    return i;
+            }
+
+        }
+        // calculate probabilities for each town (stored in probs)
+        probTo(ant);
+        // randomly select according to probs
+        double r = rand.nextDouble();
+        double tot = 0;
+        for (int i = 0; i < n; i++) {
+            tot += probs[i];
+            if (tot >= r)
+                return i;
+        }
+
+        throw new RuntimeException("Not supposed to get here.");
+    }
+
+
+'''
   #Initialize all class parameters
 
   #Number of generations which, without further optimaity will resut in termination
