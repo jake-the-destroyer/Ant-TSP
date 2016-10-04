@@ -15,7 +15,7 @@ class AntTsp:
     print("hello")
 
   #Method for finding the tour length so far of an ant
-  def tourLength( ant_tour_list ):
+  def tourLength( ant_tour_list, city_list ):
     #List of lengths of totals of tours.
     i = len(ant_tour_list[1])
 	length = []
@@ -24,11 +24,17 @@ class AntTsp:
     for ant in ant_tour_list:
 	  ant_total = 0
 	  #And for each city in the ant list
-	  for city_values in ant:
+	  current_city = ant[0]
+	  for city_values in ant[1:]:
 	    #Look up the value to travel from previous city to next city
 		
+		next_city = city_values
+		
+		distance = city_list[current_city][next_city]
+        tour_length += distance
+		current_city = next_city
 		#Add on to the total time taken
-	    tour_length += ant[city_values]
+		
       length.append(tour_length)
 	
 	#Return the list of values of total distance for each ant.
