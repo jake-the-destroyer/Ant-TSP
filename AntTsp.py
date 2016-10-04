@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+from random import randint
+
 ''' 
 First attempt at the ant algorithm to solve some simple TSP problems.  
 Note: The TSP Matrices are fed in to this program as a full Matrix inthe form of a text file
@@ -10,10 +12,27 @@ class AntTsp:
 
   #Method to ake ants visit a town and mark the town as being visited.
   def visit( ant, town ):
-    print "hello"
+    print("hello")
 
   #Method for finding the tour length so far of an ant
-  def tourLength( ant ):
+  def tourLength( ant_tour_list ):
+    #List of lengths of totals of tours.
+    i = len(ant_tour_list[1])
+	length = []
+	
+	#For each ant....
+    for ant in ant_tour_list:
+	  ant_total = 0
+	  #And for each city in the ant list
+	  for city_values in ant:
+	    #Look up the value to travel from previous city to next city
+		
+		#Add on to the total time taken
+	    tour_length += ant[city_values]
+      length.append(tour_length)
+	
+	#Return the list of values of total distance for each ant.
+	return length
     
   def readFile(libfile):
 
@@ -42,7 +61,6 @@ class AntTsp:
     for i in range(len(split_list)):
       for j in range(len(split_list[i])):
         split_list[i][j] = int(split_list[i][j])
-    #print split_list
     return split_list
 
   def placeAnts(ant_taboo_list, ant_tour_list):
@@ -82,19 +100,31 @@ class AntTsp:
     return visited_list
 
   """
-  DO THINGAS LIKE THIS NEXT:
+  DO THINGS LIKE THIS NEXT:
   """
 
   def move(ant_taboo, ant_tour):
-    print "hello"
-    ant_index = 0
-    ant_taboo.index(0)
+
+    #For each ant in the list of ants
+    for ant_index in range(0, len(ant_taboo)):
+      #find an array of free cities
+      free_cities = ant_taboo[ant_index].index(0)
+  
+      #use a probability to choose the next path NEED TO PROPERLY IMPLEMENT THIS
+      next_city = (randint(0,len(free_cities)))
+	  
+      #update both lists with the values of the new city etc.
+      ant_taboo[ant][next_city] = 1
+      ant_tour[ant].apend(next_city)
+	  
+      return ant_taboo, ant_tour
+	  
   
   def pickNext():
-    print "hello"
+    print("hello")
 
 
- '''   
+  '''   
     private void probTo(Ant ant) {
         int i = ant.tour[currentIndex];
 
@@ -148,7 +178,7 @@ class AntTsp:
     }
 
 
-'''
+  '''
   #Initialize all class parameters
 
   #Number of generations which, without further optimaity will resut in termination
@@ -187,7 +217,6 @@ class AntTsp:
   ant_tour = [[] for y in range(num_ants )]
 
   ant_visited, ant_tour = placeAnts(ant_visited, ant_tour)
-
-  print ant_visited
-  print ant_tour
-
+  
+  print(ant_visited)
+  print(ant_tour)
