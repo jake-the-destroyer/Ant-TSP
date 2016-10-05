@@ -18,27 +18,27 @@ class AntTsp:
   def tourLength( ant_tour_list, city_list ):
     #List of lengths of totals of tours.
     i = len(ant_tour_list[1])
-	length = []
+    length = []
 	
-	#For each ant....
+    #For each ant....
     for ant in ant_tour_list:
-	  ant_total = 0
-	  #And for each city in the ant list
-	  current_city = ant[0]
-	  for city_values in ant[1:]:
-	    #Look up the value to travel from previous city to next city
+      ant_total = 0
+      #And for each city in the ant list
+      current_city = ant[0]
+      for city_values in ant[1:]:
+        #Look up the value to travel from previous city to next city
 		
-		next_city = city_values
+        next_city = city_values
 		
-		distance = city_list[current_city][next_city]
-        tour_length += distance
-		current_city = next_city
-		#Add on to the total time taken
+        distance = city_list[current_city][next_city]
+        ant_total += distance
+        current_city = next_city
+        #Add on to the total time taken
 		
-      length.append(tour_length)
+      length.append(ant_total)
 	
-	#Return the list of values of total distance for each ant.
-	return length
+    #Return the list of values of total distance for each ant.
+    return length
     
   def readFile(libfile):
 
@@ -105,86 +105,30 @@ class AntTsp:
     visited_list[city_index] = 1
     return visited_list
 
-  """
-  DO THINGS LIKE THIS NEXT:
-  """
 
   def move(ant_taboo, ant_tour):
 
     #For each ant in the list of ants
-    for ant_index in range(0, len(ant_taboo)):
+    total_ants = len(ant_taboo)
+    for ant_index in range(0, total_ants):
       #find an array of free cities
-      free_cities = ant_taboo[ant_index].index(0)
-  
+      #free_cities = ant_taboo[ant_index].index(0)
+      free_cities = [i for i, x in enumerate(ant_taboo[ant_index]) if x == 0]  
       #use a probability to choose the next path NEED TO PROPERLY IMPLEMENT THIS
-      next_city = (randint(0,len(free_cities)))
+      if len(free_cities) > 0:
+        next_city_index = (randint(0,(len(free_cities) - 1)))
+        next_city = free_cities[next_city_index]
+        #update both lists with the values of the new city etc.
+        ant_taboo[ant_index][next_city] = 1
+        ant_tour[ant_index].append(next_city)
 	  
-      #update both lists with the values of the new city etc.
-      ant_taboo[ant][next_city] = 1
-      ant_tour[ant].apend(next_city)
-	  
-      return ant_taboo, ant_tour
+    return ant_taboo, ant_tour
 	  
   
   def pickNext():
     print("hello")
 
 
-  '''   
-    private void probTo(Ant ant) {
-        int i = ant.tour[currentIndex];
-
-        double denom = 0.0;
-        for (int l = 0; l < n; l++)
-            if (!ant.visited(l))
-                denom += pow(trails[i][l], alpha)
-                        * pow(1.0 / graph[i][l], beta);
-
-
-        for (int j = 0; j < n; j++) {
-            if (ant.visited(j)) {
-                probs[j] = 0.0;
-            } else {
-                double numerator = pow(trails[i][j], alpha)
-                        * pow(1.0 / graph[i][j], beta);
-                probs[j] = numerator / denom;
-            }
-        }
-
-    }
-
-    // Given an ant select the next town based on the probabilities
-    // we assign to each town. With pr probability chooses
-    // totally randomly (taking into account tabu list).
-    private int selectNextTown(Ant ant) {
-        // sometimes just randomly select
-        if (rand.nextDouble() < pr) {
-            int t = rand.nextInt(n - currentIndex); // random town
-            int j = -1;
-            for (int i = 0; i < n; i++) {
-                if (!ant.visited(i))
-                    j++;
-                if (j == t)
-                    return i;
-            }
-
-        }
-        // calculate probabilities for each town (stored in probs)
-        probTo(ant);
-        // randomly select according to probs
-        double r = rand.nextDouble();
-        double tot = 0;
-        for (int i = 0; i < n; i++) {
-            tot += probs[i];
-            if (tot >= r)
-                return i;
-        }
-
-        throw new RuntimeException("Not supposed to get here.");
-    }
-
-
-  '''
   #Initialize all class parameters
 
   #Number of generations which, without further optimaity will resut in termination
@@ -223,6 +167,10 @@ class AntTsp:
   ant_tour = [[] for y in range(num_ants )]
 
   ant_visited, ant_tour = placeAnts(ant_visited, ant_tour)
+  for cities in range(0, len(full_matrix[0])):
+
+    ant_visited, ant_tour = move(ant_visited, ant_tour)
   
   print(ant_visited)
   print(ant_tour)
+  print(tourLength(ant_tour, full_matrix))
