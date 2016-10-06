@@ -163,19 +163,21 @@ def updateTrails(ant_tour):
       full_matrix[i][j]['pheramone'] *= evaporation_rate
 
   quality = []
-  best_ants = []
- '''
+
   for distance in tourLength(ant_tour, full_matrix):
-    quality.append(distance/ 500)
-    best_ants.append(sorted(range(len(quality)), key=lambda i: quality[i], reverse=True)[:num_best_ants])
-    print(best_ants)
+    quality.append(distance)
+  print(quality)
+  best_ants = (sorted(range(len(quality)), key=lambda i: quality[i], reverse=True)[:10])
+  print(len(best_ants))
+  print(best_ants)
   for index in best_ants:
     current_city = 0
     for cities in ant_tour[index][1:]:
-      full_matrix[current_city][cities]['pheramone'] += quality[index]
-      full_matrix[cities][current_city]['pheramone'] += quality[index]
+      update_value = float(quality[index]) /500
+      full_matrix[current_city][cities]['pheramone'] += update_value
+      full_matrix[cities][current_city]['pheramone'] += update_value
       current_city = cities
-  '''
+  
 
 
 #Parsed graph
@@ -193,6 +195,6 @@ for cities in range(0, len(full_matrix[0])):
   ant_tour = move(ant_tour, full_matrix)
 
 updateTrails(ant_tour)
-#print(full_matrix[][]['pheramone'])
+print(full_matrix)
 #print(ant_tour)
 #print(tourLength(ant_tour, full_matrix))
