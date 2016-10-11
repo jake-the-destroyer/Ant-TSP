@@ -27,16 +27,16 @@ globe = 0
 evaporation_rate = 0.5
 
 #Random probability of the equation being discarded
-random_prob = 1
+random_prob = 5
 #the beow are al subject to tweaking and fixing for optimality
 #Trail intensity variable - open to fiddling and testing
-mew = 0.1
+mew = 1.0
 
 #Weight of the greedy force of the agorithm
-alpha = 1
+alpha = 5
 
 #Weight of the pheramone of the agorithm
-beta = 2
+beta = 1
 
 '''
 Method for finding the tour length so far of an ant
@@ -157,22 +157,28 @@ def pickNext(free_cities, ant_index):
     
     #Find the values for the denominator - Pheramone of all unvisited cities from current node & pheramone
     for i in range(0, len(free_cities)):
-      total_cost_of_trails += pow((1 / full_matrix[current_city][i]['length']), alpha)
-      total_prime_trail_intensity += pow(full_matrix[current_city][i]['pheramone'], beta)
-
+      trail_cost = full_matrix[current_city][i]['length']
+      if trail_cost != 0:
+        total_cost_of_trails += pow((1 / trail_cost), alpha)
+        total_prime_trail_intensity += pow(full_matrix[current_city][i]['pheramone'], beta)
+      
     denominator = total_cost_of_trails * total_prime_trail_intensity
 
 
     #for each free city....
     for i in range(0, len(free_cities)):
-
+      trail_cost = full_matrix[current_city][i]['length']
       #Let the numerator be the current city to the power of alpha by the current 
-      numerator = (pow(( 1 / full_matrix[current_city][i]['length']), alpha) 
-                 * pow(full_matrix[current_city][i]['pheramone'], beta))
-
-      #find the probability of travelling to that city
-      prob = numerator / (denominator)
-
+      if trail_cost != 0:
+        numerator = (pow(( 1 / trail_cost), alpha) 
+                   * pow(full_matrix[current_city][i]['pheramone'], beta))
+      else:
+        numerator = 0
+      if denominator > 0:
+        #find the probability of travelling to that city
+        prob = numerator / (denominator)
+      else:
+        prob = 0
       #List of probabilities of travelling to the each city
       prob_next.append(prob)
 
@@ -187,9 +193,9 @@ def pickNext(free_cities, ant_index):
       current_index = 0.0
 
       #iterate through the list of probabilities...
-      for j in range(0, len(actual_prob_next)):
+      for j in range(0, len(prob_next)):
         #upper bound for P(choosing a path)
-        next_index = actual_prob_next[j] + current_index
+        next_index = prob_next[j] + current_index
 
         
         if current_index <= index_number and index_number <= next_index:
@@ -239,4 +245,4 @@ for i in range(0, 50):
     ant_tour = move(ant_tour, full_matrix)
 
   updateTrails(ant_tour)
-  print(tourLength(ant_tour, full_matrix))
+  print(min(tourLength(ant_tour, full_matrix)))
