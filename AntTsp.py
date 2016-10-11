@@ -147,39 +147,51 @@ def pickNext(free_cities, ant_index):
     prob_next = []
 
     #Initialize total cost of the trails
-    total_cost_of_trails = 0.0
+    total_cost_of_trails = 0
 
     #Initialize the traile intensity for the next trail
-    total_prime_trail_intensity = 0.0
+    total_prime_trail_intensity = 0
  
     #let the current city be last element in the list of places the ant has visited
     current_city = ant_tour[ant_index][-1]
- 
+    
+    #Find the values for the denominator - Pheramone of all unvisited cities from current node & pheramone
     for i in range(0, len(free_cities)):
-      total_cost_of_trails += full_matrix[current_city][i]['length']
-      total_prime_trail_intensity += full_matrix[current_city][i]['pheramone']
+      total_cost_of_trails += pow((1 / full_matrix[current_city][i]['length']), alpha)
+      total_prime_trail_intensity += pow(full_matrix[current_city][i]['pheramone'], beta)
 
-    denominator = pow(total_cost_of_trails, alpha) * pow(total_prime_trail_intensity, beta)
+    denominator = total_cost_of_trails * total_prime_trail_intensity
 
+
+    #for each free city....
     for i in range(0, len(free_cities)):
 
       #Let the numerator be the current city to the power of alpha by the current 
-      numerator = pow(full_matrix[current_city][i]['length'], alpha) * pow(full_matrix[current_city][i]['pheramone'], beta)
+      numerator = (pow(( 1 / full_matrix[current_city][i]['length']), alpha) 
+                 * pow(full_matrix[current_city][i]['pheramone'], beta))
 
-      prob = numerator / (denominator + 1)
+      #find the probability of travelling to that city
+      prob = numerator / (denominator)
+
       #List of probabilities of travelling to the each city
       prob_next.append(prob)
-      actual_prob_next = []
 
-      for i in range(0, len(prob_next)):
-        actual_prob_next.append(1 / (prob_next[i] + 1))
+      #Find the total probability
+      total_prob = sum(prob_next)
 
-      total_prob = sum(actual_prob_next)
       #print(total_prob)
+      #Get the random number between 0 and the total probability
       index_number = uniform(0.0, total_prob)
+      
+      #Initialize the current index i.e the lower bound of the probability of choosing the given city
       current_index = 0.0
+
+      #iterate through the list of probabilities...
       for j in range(0, len(actual_prob_next)):
+        #upper bound for P(choosing a path)
         next_index = actual_prob_next[j] + current_index
+
+        
         if current_index <= index_number and index_number <= next_index:
           next_city = free_cities[j]
         current_index += next_index
