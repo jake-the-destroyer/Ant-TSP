@@ -217,7 +217,7 @@ def updateTrails(ant_tour):
 #Parsed graph
 full_matrix  = readFile('swiss42.tsp')
 
-for i in range(0, 200):
+for i in range(0, 50):
   #2D list of all tours performed by ants. all of which are, for now empty.
   ant_tour = [[] for y in range(num_ants )]
 
