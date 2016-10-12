@@ -27,11 +27,14 @@ globe = 0
 #Evaporation Rate.
 evaporation_rate = 0.5
 
+#contribution factor
+Q = 500.0
+
 #Random probability of the equation being discarded
 random_prob = 5
 #the beow are al subject to tweaking and fixing for optimality
 #Trail intensity variable - open to fiddling and testing
-mew = .5
+mew = 1.0
 
 #Weight of the greedy force of the agorithm
 alpha = 5
@@ -148,10 +151,10 @@ def pickNext(free_cities, ant_index):
     prob_next = []
 
     #Initialize total cost of the trails
-    total_cost_of_trails = 0
+    total_cost_of_trails = 0.0
 
     #Initialize the traile intensity for the next trail
-    total_prime_trail_intensity = 0
+    total_prime_trail_intensity = 0.0
  
     #let the current city be last element in the list of places the ant has visited
     current_city = ant_tour[ant_index][-1]
@@ -177,14 +180,15 @@ def pickNext(free_cities, ant_index):
         numerator = (pow(( 1.0 / trail_cost), alpha) 
                    * pow(full_matrix[current_city][i]['pheramone'], beta))
       else:
-        numerator = 0
+        numerator = 0.0
       #print(numerator)
       if denominator > 0:
         #find the probability of travelling to that city
         prob = numerator / denominator
       else:
-        prob = 0
+        prob = 0.0
       #List of probabilities of travelling to the each city
+      prob = round(prob, 3)
       prob_next.append(prob)
 
       #Find the total probability
@@ -207,7 +211,7 @@ def pickNext(free_cities, ant_index):
           next_city = free_cities[j]
         current_index += next_index
 
-    #print(prob_next)
+    print(prob_next)
 
 
 
@@ -224,7 +228,7 @@ def updateTrails(ant_tour):
   quality = []
 
   for distance in tourLength(ant_tour, full_matrix):
-    quality.append(distance)
+    quality.append( Q / distance)
   #print(quality)
   best_ants = (sorted(range(len(quality)), key=lambda i: quality[i], reverse=True)[:10])
   #print(len(best_ants))
@@ -238,7 +242,7 @@ def updateTrails(ant_tour):
       current_city = cities
 
 #Parsed graph
-full_matrix  = readFile('swiss42.tsp')
+full_matrix  = readFile('somerandomstuff.txt')
 min_list = []
 for i in range(0, 50):
   #2D list of all tours performed by ants. all of which are, for now empty.
@@ -254,7 +258,9 @@ for i in range(0, 50):
 
   minimum = min(tourLength(ant_tour, full_matrix))
   min_list.append(minimum)
-
-plt.plot(min_list)
-plt.ylabel('path length')
-plt.show()
+  print(minimum)
+  #print(full_matrix)
+#print(min_list)
+#plt.plot(min_list)
+#plt.ylabel('path length')
+#plt.show()
