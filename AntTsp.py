@@ -28,7 +28,7 @@ globe = 0
 evaporation_rate = 0.5
 
 #contribution factor
-Q = 500.0
+pharomone_factor = 50.0
 
 #Random probability of the equation being discarded
 random_prob = 5
@@ -45,13 +45,13 @@ beta = 1
 '''
 Method for finding the tour length so far of an ant
 '''
-def tourLength( ant_tour_list, city_list ):
+def tourLength():
   #List of lengths of totals of tours.
-  i = len(ant_tour_list[1])
+  i = len(ant_tour[1])
   length = []
 
   #For each ant....
-  for ant in ant_tour_list:
+  for ant in ant_tour:
     ant_total = 0
     #And for each city in the ant list
     current_city = ant[0]
@@ -60,7 +60,7 @@ def tourLength( ant_tour_list, city_list ):
 
       next_city = city_values
 
-      distance = city_list[current_city][next_city]['length']
+      distance = full_matrix[current_city][next_city]['length']
       ant_total += distance
       current_city = next_city
       #Add on to the total time taken
@@ -92,44 +92,41 @@ def readFile(libfile):
   return split_list
 
 '''
-method to initially place ants throughout the graph cyclically 
+method to initially place ants throughout the graph randomly 
 '''
-def placeAnts(ant_tour):
+def placeAnts():
 
-  city_index = 0
   ant_index = 0 
 
   for ant in range ( 0, len(ant_tour)):
-    #ant_taboo_list[ant_index][city_index] = 1
+    city_index = randint(0, len(full_matrix[0])) % (len(full_matrix[0]))
     ant_tour[ant_index].append(city_index)
-    city_index = (city_index + 1) % (len(full_matrix[0]))
     ant_index = ant_index + 1 
-    
   return ant_tour
 
 '''
 Method to move an ant to the next available city, based on some 
 probabilities.
 '''
-def move(ant_tour, city_list):
+def move():
 
   #For each ant in the list of ants
   total_ants = len(ant_tour)
   for ant_index in range(0, total_ants):
     #find a list of free cities
     free_cities = [] 
-    for item in range(0, len(city_list)):
+
+    for item in range(0, len(full_matrix)):
       if item not in ant_tour[ant_index]:
         free_cities.append(item)
-
-    #free_cities = [i for i, x in enumerate(ant_taboo[ant_index]) if x == 0]  
+    #print(free_cities)
+    #print(ant_tour[ant_index])
     #use a probability to choose the next path NEED TO PROPERLY IMPLEMENT THIS
     if len(free_cities) > 0:
       next_city = pickNext(free_cities, ant_index)
-
       #update both lists with the values of the new city etc.
       ant_tour[ant_index].append(next_city)
-      #next_city = free_cities[next_city_index]
+
  
   return ant_tour
  
@@ -160,9 +157,9 @@ def pickNext(free_cities, ant_index):
     current_city = ant_tour[ant_index][-1]
     
     #Find the values for the denominator - Pheramone of all unvisited cities from current node & pheramone
-    for i in range(0, len(free_cities)):
+    for i in free_cities:
       trail_cost = full_matrix[current_city][i]['length']
-      #print(trail_cost)
+      print(trail_cost)
       if trail_cost != 0:
         total_cost_of_trails = (total_cost_of_trails + pow((1.0 / trail_cost), alpha))
         total_prime_trail_intensity += pow(full_matrix[current_city][i]['pheramone'], beta)
@@ -173,7 +170,7 @@ def pickNext(free_cities, ant_index):
     #print(denominator)
 
     #for each free city....
-    for i in range(0, len(free_cities)):
+    for i in free_cities:
       trail_cost = full_matrix[current_city][i]['length']
       #Let the numerator be the current city to the power of alpha by the current 
       if trail_cost != 0:
@@ -211,7 +208,7 @@ def pickNext(free_cities, ant_index):
           next_city = free_cities[j]
         current_index += next_index
 
-    print(prob_next)
+    #print(prob_next)
 
 
 
@@ -220,15 +217,15 @@ def pickNext(free_cities, ant_index):
 '''
 Method for updating the trails of the ants.
 '''
-def updateTrails(ant_tour):
+def updateTrails():
   for i in range(0, len(full_matrix)):
     for j in range(0, len(full_matrix)):
       full_matrix[i][j]['pheramone'] *= evaporation_rate
 
   quality = []
 
-  for distance in tourLength(ant_tour, full_matrix):
-    quality.append( Q / distance)
+  for distance in tourLength():
+    quality.append(distance)
   #print(quality)
   best_ants = (sorted(range(len(quality)), key=lambda i: quality[i], reverse=True)[:10])
   #print(len(best_ants))
@@ -236,29 +233,39 @@ def updateTrails(ant_tour):
   for index in best_ants:
     current_city = 0
     for cities in ant_tour[index][1:]:
-      update_value = float(quality[index]) /500
+      update_value = float(quality[index]) / pharomone_factor
       full_matrix[current_city][cities]['pheramone'] += update_value
       full_matrix[cities][current_city]['pheramone'] += update_value
       current_city = cities
+  #print(full_matrix[0][0]['pheramone'])
+
+
+
+
+
+
+
+
+
 
 #Parsed graph
-full_matrix  = readFile('somerandomstuff.txt')
+full_matrix  = readFile('swiss42.tsp')
 min_list = []
 for i in range(0, 50):
   #2D list of all tours performed by ants. all of which are, for now empty.
   ant_tour = [[] for y in range(num_ants )]
 
-  ant_tour = placeAnts( ant_tour)
+  ant_tour = placeAnts()
   for cities in range(0, len(full_matrix[0])):
 
-    ant_tour = move(ant_tour, full_matrix)
+    ant_tour = move()
 
-  updateTrails(ant_tour)
+  updateTrails()
   #print(ant_tour)
 
-  minimum = min(tourLength(ant_tour, full_matrix))
+  minimum = min(tourLength())
   min_list.append(minimum)
-  print(minimum)
+  #print(minimum)
   #print(full_matrix)
 #print(min_list)
 #plt.plot(min_list)
