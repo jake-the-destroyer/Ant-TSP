@@ -13,7 +13,7 @@ Note: The TSP Matrices are fed in to this program as a full Matrix inthe form of
 
 #Number of generations which, without further optimaity will resut in termination
 # Number of Ants
-num_ants = 1
+num_ants = 10
 
 #Number of Ants per generation for optimization
 num_best_ants = 1
@@ -38,7 +38,7 @@ random_prob = 5
 mew = 1.0
 
 #Weight of the greedy force of the agorithm
-alpha = 5.0
+alpha = 1.0
 
 #Weight of the pheramone of the agorithm
 beta = 1.0
@@ -160,49 +160,37 @@ def pickNext(free_cities, ant_index):
     #Find the values for the denominator - Pheramone of all unvisited cities from current node & pheramone
     for i in free_cities:
       trail_cost = full_matrix[current_city][i]['length']
-      #print(trail_cost)
-      
-      if trail_cost != 0:
-        total_cost_of_trails += pow((1.0 / trail_cost), alpha)
-        total_prime_trail_intensity += pow(full_matrix[current_city][i]['pheramone'], beta)
+      pharomone = full_matrix[current_city][i]['pheramone']
 
-      #print(total_cost_of_trails)
-      #print(total_prime_trail_intensity)
-      
-    denominator = total_cost_of_trails * total_prime_trail_intensity
-    #print(denominator)
+      total_cost_of_trails = pow((1.0 / trail_cost), alpha)
+      total_prime_trail_intensity = pow(pharomone, beta)
+
+      denominator += total_cost_of_trails * total_prime_trail_intensity
 
     #for each free city....
     for i in free_cities:
       trail_cost = full_matrix[current_city][i]['length']
-      #Let the numerator be the current city to the power of alpha by the current 
-      
-      if trail_cost != 0:
-        numerator = (pow(( 1.0 / trail_cost), alpha)       
-                   * pow(full_matrix[current_city][i]['pheramone'], beta))
+      pharomone = full_matrix[current_city][i]['pheramone']
 
-      else:
-        numerator = 0.0
-      #print(numerator)
-      if denominator > 0:
-        #find the probability of travelling to that city
-        prob = numerator / denominator
-      else:
-        prob = 0.0
+      #Let the numerator be the current city to the power of alpha by the current 
+      numerator = (pow(( 1.0 / trail_cost), alpha)) * (pow(pharomone, beta))
+
+
+      prob = numerator / denominator
+
+
       #List of probabilities of travelling to the each city
-      prob = round(prob, 3)
+ 
       prob_next.append(prob)
     #print(free_cities)
     #print(prob_next)
-    next_city_index = prob_next.index(max(prob_next))
-    next_city = free_cities[next_city_index]
-    '''
+    #print(sum(prob_next))
+    
     #Find the total probability
-    total_prob = sum(prob_next)
 
     #print(total_prob)
     #Get the random number between 0 and the total probability
-    index_number = uniform(0.0, total_prob)
+    index_number = uniform(0.0, 1.0)
       
     #Initialize the current index i.e the lower bound of the probability of choosing the given city
     current_index = 0.0
@@ -218,7 +206,7 @@ def pickNext(free_cities, ant_index):
       current_index = next_index
 
     #print(prob_next)
-    '''
+    
 
   #print(ant_tour)
   #print(next_city)
@@ -259,9 +247,9 @@ def updateTrails():
 
 
 #Parsed graph
-full_matrix  = readFile('somerandomstuff.txt')
+full_matrix  = readFile('swiss42.tsp')
 min_list = []
-for i in range(0, 5):
+for i in range(0, 50):
   #2D list of all tours performed by ants. all of which are, for now empty.
   ant_tour = [[] for y in range(num_ants )]
 
