@@ -13,7 +13,7 @@ Note: The TSP Matrices are fed in to this program as a full Matrix inthe form of
 
 #Number of generations which, without further optimaity will resut in termination
 # Number of Ants
-num_ants = 10
+num_ants = 1
 
 #Number of Ants per generation for optimization
 num_best_ants = 1
@@ -32,22 +32,23 @@ pharomone_factor = 50.0
 
 #Random probability of the equation being discarded
 random_prob = 5
+
 #the beow are al subject to tweaking and fixing for optimality
 #Trail intensity variable - open to fiddling and testing
 mew = 1.0
 
 #Weight of the greedy force of the agorithm
-alpha = 5
+alpha = 5.0
 
 #Weight of the pheramone of the agorithm
-beta = 1
+beta = 1.0
 
 '''
 Method for finding the tour length so far of an ant
 '''
 def tourLength():
   #List of lengths of totals of tours.
-  i = len(ant_tour[1])
+  i = len(ant_tour[0])
   length = []
 
   #For each ant....
@@ -135,7 +136,7 @@ Method for picking random city using formula or otherwise.
 '''
 def pickNext(free_cities, ant_index):
   #Randomly pick a totally random path...
-  if randint(0, 100) <= random_prob:
+  if randint(0, 1000) <= random_prob:
     next_city_index = (randint(0,(len(free_cities) - 1)))
     next_city = free_cities[next_city_index]
     #else, use the formula
@@ -159,12 +160,14 @@ def pickNext(free_cities, ant_index):
     #Find the values for the denominator - Pheramone of all unvisited cities from current node & pheramone
     for i in free_cities:
       trail_cost = full_matrix[current_city][i]['length']
-      print(trail_cost)
+      #print(trail_cost)
+      
       if trail_cost != 0:
-        total_cost_of_trails = (total_cost_of_trails + pow((1.0 / trail_cost), alpha))
+        total_cost_of_trails += pow((1.0 / trail_cost), alpha)
         total_prime_trail_intensity += pow(full_matrix[current_city][i]['pheramone'], beta)
-        #print(total_cost_of_trails)
-        #print(total_prime_trail_intensity)
+
+      #print(total_cost_of_trails)
+      #print(total_prime_trail_intensity)
       
     denominator = total_cost_of_trails * total_prime_trail_intensity
     #print(denominator)
@@ -173,9 +176,11 @@ def pickNext(free_cities, ant_index):
     for i in free_cities:
       trail_cost = full_matrix[current_city][i]['length']
       #Let the numerator be the current city to the power of alpha by the current 
+      
       if trail_cost != 0:
-        numerator = (pow(( 1.0 / trail_cost), alpha) 
+        numerator = (pow(( 1.0 / trail_cost), alpha)       
                    * pow(full_matrix[current_city][i]['pheramone'], beta))
+
       else:
         numerator = 0.0
       #print(numerator)
@@ -187,31 +192,36 @@ def pickNext(free_cities, ant_index):
       #List of probabilities of travelling to the each city
       prob = round(prob, 3)
       prob_next.append(prob)
+    #print(free_cities)
+    #print(prob_next)
+    next_city_index = prob_next.index(max(prob_next))
+    next_city = free_cities[next_city_index]
+    '''
+    #Find the total probability
+    total_prob = sum(prob_next)
 
-      #Find the total probability
-      total_prob = sum(prob_next)
-
-      #print(total_prob)
-      #Get the random number between 0 and the total probability
-      index_number = uniform(0.0, total_prob)
+    #print(total_prob)
+    #Get the random number between 0 and the total probability
+    index_number = uniform(0.0, total_prob)
       
-      #Initialize the current index i.e the lower bound of the probability of choosing the given city
-      current_index = 0.0
+    #Initialize the current index i.e the lower bound of the probability of choosing the given city
+    current_index = 0.0
 
-      #iterate through the list of probabilities...
-      for j in range(0, len(prob_next)):
-        #upper bound for P(choosing a path)
-        next_index = prob_next[j] + current_index
+    #iterate through the list of probabilities...
+    for j in range(0, len(prob_next)):
+      #upper bound for P(choosing a path)
+      next_index = prob_next[j] + current_index
 
         
-        if current_index <= index_number and index_number <= next_index:
-          next_city = free_cities[j]
-        current_index += next_index
+      if current_index <= index_number and index_number <= next_index:
+        next_city = free_cities[j]
+      current_index = next_index
 
     #print(prob_next)
+    '''
 
-
-
+  #print(ant_tour)
+  #print(next_city)
   return next_city
 
 '''
@@ -249,9 +259,9 @@ def updateTrails():
 
 
 #Parsed graph
-full_matrix  = readFile('swiss42.tsp')
+full_matrix  = readFile('somerandomstuff.txt')
 min_list = []
-for i in range(0, 50):
+for i in range(0, 5):
   #2D list of all tours performed by ants. all of which are, for now empty.
   ant_tour = [[] for y in range(num_ants )]
 
@@ -268,6 +278,7 @@ for i in range(0, 50):
   #print(minimum)
   #print(full_matrix)
 #print(min_list)
-#plt.plot(min_list)
-#plt.ylabel('path length')
-#plt.show()
+#print(full_matrix)
+plt.plot(min_list)
+plt.ylabel('path length')
+plt.show()
