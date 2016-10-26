@@ -13,10 +13,10 @@ Note: The TSP Matrices are fed in to this program as a full Matrix inthe form of
 
 #Number of generations which, without further optimaity will resut in termination
 # Number of Ants
-num_ants = 10
+num_ants = 100
 
 #Number of Ants per generation for optimization
-num_best_ants = 1
+num_best_ants = 100
 
 #Random Number for local trail updating
 local = 0
@@ -237,36 +237,27 @@ def updateTrails():
       current_city = cities
   #print(full_matrix[0][0]['pheramone'])
 
-
-
-
-
-
-
-
-
-
 #Parsed graph
 full_matrix  = readFile('swiss42.tsp')
-min_list = []
+
+
+previous_averages = []
+average_list = []
 for i in range(0, 50):
+
   #2D list of all tours performed by ants. all of which are, for now empty.
   ant_tour = [[] for y in range(num_ants )]
-
   ant_tour = placeAnts()
-  for cities in range(0, len(full_matrix[0])):
 
+  for cities in range(0, len(full_matrix[0])):
     ant_tour = move()
 
   updateTrails()
-  #print(ant_tour)
 
-  minimum = min(tourLength())
-  min_list.append(minimum)
-  #print(minimum)
-  #print(full_matrix)
-#print(min_list)
-#print(full_matrix)
-plt.plot(min_list)
+  current_minimum = min(tourLength())
+  current_average = (current_minimum + sum(average_list)) / (len(average_list) + 1)
+  average_list.append(current_average)
+
+plt.plot(average_list)
 plt.ylabel('path length')
 plt.show()
