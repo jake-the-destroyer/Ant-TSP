@@ -16,7 +16,7 @@ Note: The TSP Matrices are fed in to this program as a full Matrix inthe form of
 num_ants = 100
 
 #Number of Ants per generation for optimization
-num_best_ants = 100
+num_best_ants = 30
 
 #Random Number for local trail updating
 local = 0
@@ -28,17 +28,17 @@ globe = 0
 evaporation_rate = 0.5
 
 #contribution factor
-pharomone_factor = 50.0
+pharomone_factor = 30.0
 
 #Random probability of the equation being discarded
-random_prob = 5
+random_prob = 1
 
 #the beow are al subject to tweaking and fixing for optimality
 #Trail intensity variable - open to fiddling and testing
 mew = 1.0
 
 #Weight of the greedy force of the agorithm
-alpha = 1.0
+alpha = 5.0
 
 #Weight of the pheramone of the agorithm
 beta = 1.0
@@ -77,20 +77,23 @@ a 3d list of cities with distances and tuples
 '''  
 def readFile(libfile):
 
+  i = 0
   j = 0
   with open(libfile) as f:
     content = f.readlines()
     f.close()
 
   split_list = []
-  i=0
+  resulting_graph = []
+  
   for term in content:
     split_list.append(term.split( ))
 
   for i in range(len(split_list)):
+    resulting_graph.append([])
     for j in range(len(split_list[i])):
-      split_list[i][j] = {'length' : int(split_list[i][j]),'pheramone' : mew}
-  return split_list
+      resulting_graph[i].append( {'length' : int(split_list[i][j]),'pheramone' : mew} )
+  return resulting_graph
 
 '''
 method to initially place ants throughout the graph randomly 
@@ -136,7 +139,7 @@ Method for picking random city using formula or otherwise.
 '''
 def pickNext(free_cities, ant_index):
   #Randomly pick a totally random path...
-  if randint(0, 1000) <= random_prob:
+  if randint(0, 100) <= random_prob:
     next_city_index = (randint(0,(len(free_cities) - 1)))
     next_city = free_cities[next_city_index]
     #else, use the formula
@@ -243,6 +246,7 @@ full_matrix  = readFile('swiss42.tsp')
 
 previous_averages = []
 average_list = []
+min_list = []
 for i in range(0, 50):
 
   #2D list of all tours performed by ants. all of which are, for now empty.
@@ -255,9 +259,10 @@ for i in range(0, 50):
   updateTrails()
 
   current_minimum = min(tourLength())
+  min_list.append(current_minimum)
   current_average = (current_minimum + sum(average_list)) / (len(average_list) + 1)
   average_list.append(current_average)
-
+  print(min(min_list))
 plt.plot(average_list)
 plt.ylabel('path length')
 plt.show()
