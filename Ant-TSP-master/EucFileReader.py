@@ -3,7 +3,7 @@
 x_coords = []
 y_coords = []
 real_map = []
-
+two_d_plane = []
 
 def readFile(libfile):
 
@@ -32,10 +32,21 @@ def readFile(libfile):
 
   #for each coordinate, if there is a city, mark a 1 in the map.
   for i in range(len(x_coords)):
-    real_map[int(x_coords[i])][int(y_coords[i])] = 1
+    real_map[ x_coords[i] -1 ][ y_coords[i] - 1 ] = 1
 
+  for i in range(len(real_map)):
+    for j in range(len(real_map[i])):
+      if real_map[i][j] == 1:
+        #Find new points
+        for h in range(len(real_map)):
+          for k in range(len(real_map[h])):
+            if real_map[h][k] == 1:
+              if real_map[i][k] != 1:
+                real_map[i][k] = 2
+              if real_map[h][j] != 1:
+                real_map[h][j] = 2
+                break
 
-readFile("eil51.tsp")
-#print x_coords
-#print y_coords    
-print real_map      
+readFile("eil15.tsp")
+for i in real_map:
+  print(i)
