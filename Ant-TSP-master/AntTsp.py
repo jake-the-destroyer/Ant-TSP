@@ -243,7 +243,6 @@ def updateTrails():
 #Parsed graph
 full_matrix  = readFile('swiss42.tsp')
 
-
 previous_averages = []
 average_list = []
 min_list = []

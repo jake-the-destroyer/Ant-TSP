@@ -23,16 +23,16 @@ def readFile(libfile):
   for coordinate in split_list:
     x_coords.append(int(coordinate[1]))
     y_coords.append(int(coordinate[2]))
-    
+
   #initialize a map that contains all zeros
-  for x in range(max(x_coords)):
+  for x in range(max(x_coords) + 1):
     real_map.append([])
-    for y in range(max(y_coords)):
+    for y in range(max(y_coords) + 1):
       real_map[x].append(0)
 
   #for each coordinate, if there is a city, mark a 1 in the map.
   for i in range(len(x_coords)):
-    real_map[ x_coords[i] -1 ][ y_coords[i] - 1 ] = 1
+    real_map[ x_coords[i]][ y_coords[i]] = 1
 
   for i in range(len(real_map)):
     for j in range(len(real_map[i])):
@@ -47,6 +47,12 @@ def readFile(libfile):
                 real_map[h][j] = 2
                 break
 
+
+'''
+  for i in range(len(real_map)):
+    for j in range(len(real_map[i])):
+      if real_map[i][j] == 2:
+'''
 readFile("eil15.tsp")
 for i in real_map:
   print(i)
