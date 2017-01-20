@@ -47,7 +47,9 @@ def readFile(libfile):
                 real_map[h][j] = 2
                 break
 
-
+  for i in real_map:
+    print(i)
+  print ("---------------------------------------")
   for i in range(len(real_map)):
     for j in range(len(real_map[i])):
       if real_map[i][j] == 2:
@@ -73,38 +75,54 @@ def readFile(libfile):
           else:
             left = left - 1
 
-        while (foundRight == False and right < len(real_map)):
-          point = real_map[right][j]
-          if point == 2:
-            foundRight = True
-          elif point == 1:
-            keep = True
-            foundRight = True
-          else:
-            right = right + 1
+        if not keep:
 
-        while (foundUp == False and up >= 0):
-          point = real_map[i][up]
-          if point == 2:
-            foundUp = True
-          elif point == 1:
-            keep = True
-            foundUp = True
-          else:
-            up = (up - 1)
+          while (foundRight == False and right < len(real_map)):
+            point = real_map[right][j]
+            if point == 2:
+              foundRight = True
+            elif point == 1:
+              keep = True
+              foundRight = True
+            else:
+              right = right + 1
+  
+          if not keep:
+            while (foundUp == False and up >= 0):
+              point = real_map[i][up]
+              if point == 2:
+                foundUp = True
+              elif point == 1:
+                keep = True
+                foundUp = True
+              else:
+                up = (up - 1)
+    
+            if not keep:
+              while (foundDown == False and down < len(real_map[i])):
+                point = real_map[i][down]
+                if point == 2:
+                  foundDown = True
+                elif point == 1:
+                  keep = True
+                  foundDown = True
+                else:
+                  down = (down + 1)
 
-        while (foundDown == False and down < len(real_map[j])):
-          point = real_map[i][down]
-          if point == 2:
-            foundDown = True
-          elif point == 1:
-            keep = True
-            foundDown = True
-          else:
-            down = (down + 1)
+        if (not keep) and (foundLeft or foundRight) and (foundUp or foundDown):           
 
-        if (not keep) and (foundLeft or foundRight) and (foundUp or foundDown):
-          print("Delete Point %d %d" % (i, j))
+          if (foundLeft and foundUp):
+            if real_map[left][up] == 2:
+              real_map[i][j] = 0
+          elif (foundRight and foundUp):
+            if real_map[right][up] == 2:
+              real_map[i][j] = 0
+          elif (foundLeft and foundDown):
+            if real_map[left][down] == 2:
+              real_map[i][j] = 0
+          elif (foundRight and foundDown):
+            if real_map[right][down] == 2:
+              real_map[i][j] = 0
 
 
 '''
