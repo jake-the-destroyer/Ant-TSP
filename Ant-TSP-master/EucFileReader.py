@@ -38,13 +38,16 @@ def readFile(libfile):
   #for each coordinate, if there is a city, mark a 1 in the map.
   for i in range(len(x_coords)):
     real_map[ x_coords[i]][ y_coords[i]] = 1
-
+  
+  #iterate through the mapa and find all points
   for i in range(len(real_map)):
     for j in range(len(real_map[i])):
       if real_map[i][j] == 1:
-        #Find new points
+        #Find new points at the intersection of horizontal and vertical lines
+        #from the already existing points on the map i.e. Find Hanan Graph
         for h in range(len(real_map)):
           for k in range(len(real_map[h])):
+            #At the points of intersection create the Steiner points
             if real_map[h][k] == 1:
               if real_map[i][k] != 1:
                 real_map[i][k] = 2
@@ -52,9 +55,10 @@ def readFile(libfile):
                 real_map[h][j] = 2
                 break
 
-
+  #Use the convex hull reduction algorithm to reduce the number of steiner points
   for i in range(len(real_map)):
     for j in range(len(real_map[i])):
+      #If the point is a Steiner point...
       if real_map[i][j] == 2:
 
         left = (i - 1)
@@ -68,7 +72,12 @@ def readFile(libfile):
         foundDown = False 
         keep = False       
 
-        while (foundLeft == False and left >= 0):
+        '''
+        search left, right, up and down for the next point on 
+        horizontal and vertical axes. If the next point in any direction
+        is not a steiner point keep the steiner point.
+		'''
+		while (foundLeft == False and left >= 0):
           point = real_map[left][j]
           if point == 2:
             foundLeft = True
@@ -112,6 +121,11 @@ def readFile(libfile):
                 else:
                   down = (down + 1)
 
+        '''
+        If the adjacent points to current Steiner point are ALL steiner points,
+        find the points of intersection of these points on the horizontal axes.
+        If these points are also steiner we may delete the original point.
+        '''
         if (not keep) and (foundLeft or foundRight) and (foundUp or foundDown):           
 
           if (foundLeft and foundUp):
@@ -126,43 +140,7 @@ def readFile(libfile):
           elif (foundRight and foundDown):
             if real_map[right][down] == 2:
               real_map[i][j] = 0
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
-			  
+
   count = 0
   for i in range(len(real_map)):
     for j in range(len(real_map[i])):
@@ -240,12 +218,7 @@ def readFile(libfile):
           distance = down - j
           two_d_plane[fromPoint][toPoint] = {'length' : distance,'pheramone' : mew}
 
-			  
-'''
-  for i in range(len(real_map)):
-    for j in range(len(real_map[i])):
-      if real_map[i][j] == 2:
-'''
+
 readFile("eil15.tsp")
 for i in real_map:
   print(i)
