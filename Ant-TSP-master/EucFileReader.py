@@ -1,5 +1,42 @@
 #!/usr/bin/python
 
+#import matplotlib.pyplot as plt
+from random  import *
+import math
+''' 
+First attempt at the ant algorithm to solve some simple TSP problems.  
+Note: The TSP Matrices are fed in to this program as a full Matrix inthe form of a text file
+'''
+
+
+#Initialize all class parameters
+
+#Random Number for local trail updating
+local = 0
+
+#Random number for global trail updating
+globe = 0
+
+#Evaporation Rate.
+evaporation_rate = 0.5
+
+#contribution factor
+pharomone_factor = 30.0
+
+#Random probability of the equation being discarded
+random_prob = 1
+
+#the beow are al subject to tweaking and fixing for optimality
+#Trail intensity variable - open to fiddling and testing
+mew = 1.0
+
+#Weight of the greedy force of the agorithm
+alpha = 5.0
+
+#Weight of the pheramone of the agorithm
+beta = 1.0
+
+
 x_coords = []
 y_coords = []
 real_map = []
@@ -7,7 +44,8 @@ count_map = []
 two_d_plane = []
 necessary_points = []
 
-mew = 1.0
+ant_tour = []
+
 
 def readFile(libfile):
   #open the supplied file
@@ -231,12 +269,190 @@ def graphToMatrix():
           two_d_plane[fromPoint][toPoint] = {'length' : distance,'pheramone' : mew}
 
 
+'''
+method to initially place ants on each necessary point in the graph. 
+'''
+def placeAnts():
+  ant_index = 0
+  for ant in range(0, len(ant_tour)):
+    ant_tour[ant].append(-1)
+    ant_tour[ant].append(necessary_points[ant])
+  return ant_tour
 
-content = readFile("eil15.tsp")
-makeHananGraph(content)
-reduceHananGraph()
-graphToMatrix()
 
+'''
+Method to move an ant to the next available city, based on some 
+probabilities.
+'''
+def move():
+
+  #For each ant in the list of ants
+  total_ants = len(ant_tour)
+  for ant_index in range(total_ants):
+    
+    #if the ant is still active.... 
+    if ant_tour[ant_index][0] == -1:
+      #find a list of free cities
+      free_cities = [] 
+
+      for city in range(len(two_d_plane[ant_tour[ant_index][-1]])):
+        if two_d_plane[ant_tour[ant_index][-1]][city] != None and city not in ant_tour[ant_index]:
+          free_cities.append(city)
+      print(free_cities)
+      #print(ant_tour[ant_index])
+      #use a probability to choose the next path NEED TO PROPERLY IMPLEMENT THIS
+      '''
+      if len(free_cities) > 0:
+        next_city = pickNext(free_cities, ant_index)
+        #update both lists with the values of the new city etc.
+        ant_tour[ant_index].append(next_city)
+      '''
+ 
+  return ant_tour
+
+'''
+Method for one ant consiming another.
+'''
+def gobble():
+  return None
+
+'''
+Method for picking random city using formula or otherwise.
+'''
+def pickNext(free_cities, ant_index):
+  #Randomly pick a totally random path...
+  if randint(0, 100) <= random_prob:
+    next_city_index = (randint(0,(len(free_cities) - 1)))
+    next_city = free_cities[next_city_index]
+    #else, use the formula
+
+  else:
+    #Initialize denominator variable
+    denominator = 0.0 
+
+    #Make a list of the probabilites to go to the next city
+    prob_next = []
+
+    #Initialize total cost of the trails
+    total_cost_of_trails = 0.0
+
+    #Initialize the traile intensity for the next trail
+    total_prime_trail_intensity = 0.0
+ 
+    #let the current city be last element in the list of places the ant has visited
+    current_city = ant_tour[ant_index][-1]
+    
+    #Find the values for the denominator - Pheramone of all unvisited cities from current node & pheramone
+    for i in free_cities:
+      trail_cost = two_d_plane[current_city][i]['length']
+      pharomone = two_d_plane[current_city][i]['pheramone']
+
+      total_cost_of_trails = pow((1.0 / trail_cost), alpha)
+      total_prime_trail_intensity = pow(pharomone, beta)
+
+      denominator += total_cost_of_trails * total_prime_trail_intensity
+
+    #for each free city....
+    for i in free_cities:
+      trail_cost = two_d_plane[current_city][i]['length']
+      pharomone = two_d_plane[current_city][i]['pheramone']
+
+      #Let the numerator be the current city to the power of alpha by the current 
+      numerator = (pow(( 1.0 / trail_cost), alpha)) * (pow(pharomone, beta))
+
+
+      prob = numerator / denominator
+
+
+      #List of probabilities of travelling to the each city
+ 
+      prob_next.append(prob)
+    #print(free_cities)
+    #print(prob_next)
+    #print(sum(prob_next))
+    #Find the total probability
+
+    #print(total_prob)
+    #Get the random number between 0 and the total probability
+    index_number = uniform(0.0, 1.0)
+      
+    #Initialize the current index i.e the lower bound of the probability of choosing the given city
+    current_index = 0.0
+
+    #iterate through the list of probabilities...
+    for j in range(0, len(prob_next)):
+      #upper bound for P(choosing a path)
+      next_index = prob_next[j] + current_index
+
+        
+      if current_index <= index_number and index_number <= next_index:
+        next_city = free_cities[j]
+      current_index = next_index
+
+    #print(prob_next)
+    
+
+  #print(ant_tour)
+  #print(next_city)
+  return next_city
+
+
+'''
+Method for updating the trails of the ants.
+'''
+def updateTrails():
+  for i in range(0, len(two_d_plane)):
+    for j in range(0, len(two_d_plane)):
+      two_d_plane[i][j]['pheramone'] *= evaporation_rate
+
+  quality = []
+
+  for distance in tourLength():
+    quality.append(distance)
+  #print(quality)
+  best_ants = (sorted(range(len(quality)), key=lambda i: quality[i], reverse=True)[:10])
+  #print(len(best_ants))
+  #print(best_ants)
+  for index in best_ants:
+    current_city = 0
+    for cities in ant_tour[index][1:]:
+      update_value = float(quality[index]) / pharomone_factor
+      two_d_plane[current_city][cities]['pheramone'] += update_value
+      two_d_plane[cities][current_city]['pheramone'] += update_value
+      current_city = cities
+  #print(two_d_plane[0][0]['pheramone'])
+
+
+'''
+Method for finding the tour length so far of an ant
+'''
+def tourLength():
+  #List of lengths of totals of tours.
+  i = len(ant_tour[0])
+  length = []
+
+  #For each ant....
+  for ant in ant_tour:
+    ant_total = 0
+    #And for each city in the ant list
+    current_city = ant[0]
+    for city_values in ant[1:]:
+      #Look up the value to travel from previous city to next city
+
+      next_city = city_values
+
+      distance = two_d_plane[current_city][next_city]['length']
+      ant_total += distance
+      current_city = next_city
+      #Add on to the total time taken
+
+    length.append(ant_total)
+
+  #Return the list of values of total distance for each ant.
+  return length
+
+
+'''
 for i in real_map:
   print(i)
   
@@ -248,4 +464,16 @@ for k in two_d_plane:
     if u != None:
       print(u)
   print("--------------")
+'''
+
+
+content = readFile("eil15.tsp")
+makeHananGraph(content)
+reduceHananGraph()
+graphToMatrix()
+
+ant_tour = [[] for y in range(len(necessary_points))]
+ant_tour = placeAnts()
+move()
+print(ant_tour)
 print(necessary_points)
