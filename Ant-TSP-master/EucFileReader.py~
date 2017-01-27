@@ -489,4 +489,5 @@ while not found:
   print("---------------------------------------------")
   move()
   gobble()
+  updateTrails()
 print(necessary_points)
