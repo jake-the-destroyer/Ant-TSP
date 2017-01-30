@@ -388,6 +388,17 @@ def gobble():
   for current_ant in range(len(ant_tour) - 1):
     if ant_tour[current_ant][0] == -1:  
       active_ants += 1
+
+      #Turn this into a list iterator
+      found_points = 0
+      for x in necessary_points:
+        if x in ant_tour[current_ant]:
+          found_points += 1
+      print(found_points)
+      print(len(necessary_points))
+      if found_points >= len(necessary_points):
+        found = True
+
       for next_ant in range(current_ant + 1, len(ant_tour)):
         if ant_tour[next_ant][0] == -1:
           cacc = ant_tour[current_ant][-1]
