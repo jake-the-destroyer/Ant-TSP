@@ -286,28 +286,25 @@ probabilities.
 '''
 def move():
 
-  #For each ant in the list of ants
-  total_ants = len(ant_tour)
-  for ant_index in range(total_ants):
-    
-    #if the ant is still active.... 
-    if ant_tour[ant_index][0] == -1:
-      #find a list of free cities
-      free_cities = [] 
+  #Generate a list of all active ants.
+  active_ants = [x for x in range(len(ant_tour)) if ant_tour[x][0] == -1]
+  #Pick one of the active ants at random. 
+  ant_index = active_ants[randint(0, len(active_ants)-1)]
+  
+  #find a list of free cities
+  free_cities = [] 
 
-      for city in range(len(two_d_plane[ant_tour[ant_index][-1]])):
-        if two_d_plane[ant_tour[ant_index][-1]][city] != None and city not in ant_tour[ant_index]:
-          free_cities.append(city)
-      #print(free_cities)
-      #print(ant_tour[ant_index])
-      #use a probability to choose the next path NEED TO PROPERLY IMPLEMENT THIS
+  for city in range(len(two_d_plane[ant_tour[ant_index][-1]])):
+    if two_d_plane[ant_tour[ant_index][-1]][city] != None and city not in ant_tour[ant_index]:
+      free_cities.append(city)
 
-      if len(free_cities) > 0:
-        next_city = pickNext(free_cities, ant_index)
-        #update both lists with the values of the new city etc.
-        ant_tour[ant_index].append(next_city)
+  if len(free_cities) > 0:
+    next_city = pickNext(free_cities, ant_index)
+    #update both lists with the values of the new city etc.
+    ant_tour[ant_index].append(next_city)
 
   return ant_tour
+
 
 '''
 Method for picking random city using formula or otherwise.
@@ -389,7 +386,14 @@ def gobble():
     if ant_tour[current_ant][0] == -1:  
       active_ants += 1
 
+      '''
       #Turn this into a list iterator
+      if ([x for x in necessary_points if x in ant_tour[current_ant]].count(False) == 0):
+        found = True
+      '''
+
+
+      '''
       found_points = 0
       for x in necessary_points:
         if x in ant_tour[current_ant]:
@@ -398,18 +402,14 @@ def gobble():
       print(len(necessary_points))
       if found_points >= len(necessary_points):
         found = True
+      '''
 
       for next_ant in range(current_ant + 1, len(ant_tour)):
         if ant_tour[next_ant][0] == -1:
           cacc = ant_tour[current_ant][-1]
           nacc = ant_tour[next_ant][-1]
-          capc = ant_tour[current_ant][-2]
-          napc = ant_tour[next_ant][-2]
           if (cacc == nacc):
               ant_tour[current_ant] = ant_tour[current_ant] + ant_tour[next_ant][1:-1]
-              ant_tour[next_ant][0] = None
-          elif (cacc == napc and capc == nacc):
-              ant_tour[current_ant] = ant_tour[current_ant] + ant_tour[next_ant][1:-2]
               ant_tour[next_ant][0] = None
 
   if active_ants == 1:
@@ -494,10 +494,12 @@ graphToMatrix()
 found = False
 ant_tour = [[] for y in range(len(necessary_points))]
 ant_tour = placeAnts()
-while not found:
+rounds = 0
+while rounds < 20:
   for i in ant_tour:
     print(i)
   print("---------------------------------------------")
   move()
   gobble()
+  rounds += 1
 print(necessary_points)
