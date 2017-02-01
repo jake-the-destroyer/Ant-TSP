@@ -269,6 +269,60 @@ def graphToMatrix():
           two_d_plane[fromPoint][toPoint] = {'length' : distance,'pheramone' : mew}
 
 
+def shortestPathByEuclid():
+  shortest_distance = []
+  total_points = len(two_d_plane)
+  for i in range(total_points):
+    shortest_distance.append([])
+    for j in range(total_points):
+      shortest_distance[i].append(None)
+  
+  for i in range(len(count_map)):
+    for j in range(len(count_map[i])):
+      if count_map[i][j][0] == 1 or count_map[i][j][0] == 2:
+        
+        for k in range(len(count_map)):
+          for l in range(len(count_map[k])):
+            if count_map[k][l][0] == 1 or count_map[k][l][0] == 2:
+              shortest_distance[count_map[i][j][1]][count_map[l][k][1]] = math.sqrt(math.pow(i + k, 2) + math.pow(j + l, 2))
+
+  return shortest_distance
+
+
+'''
+
+def initializeDijkstra():
+
+  total_points = len(two_d_plane)
+  SSSD = []
+
+  #Initialize the 2D single point shortest distance graph
+  for i in range(total_points):
+    SSSD.append([])
+    for j in range(total_points):
+      SSSD[i].append(None)
+
+  for i in range(total_points):
+    for j in range(total_points):
+      SSSD[i][j] = shortestPath(total_points, i, j)
+
+  return SSSD
+
+
+def shortestPath(total_points, start, end):
+
+  path_length = 0
+  
+  if(start != end):
+    visited = []
+    unvisited = []
+    for i in range(total_points):
+      unvisited.append(i)
+     
+  
+  return path_length
+'''  			
+
 '''
 method to initially place ants on each necessary point in the graph. 
 '''
@@ -373,8 +427,6 @@ def pickNext(free_cities, ant_index):
   #print(ant_tour)
   #print(next_city)
   return next_city
-
-
 
 
 '''
@@ -484,6 +536,11 @@ for k in two_d_plane:
     if u != None:
       print(u)
   print("--------------")
+
+
+
+
+
 '''
 
 
@@ -494,6 +551,14 @@ graphToMatrix()
 found = False
 ant_tour = [[] for y in range(len(necessary_points))]
 ant_tour = placeAnts()
+
+for i in count_map:
+  print(i)
+print(len(two_d_plane))
+thing = shortestPathByEuclid()
+for i in thing: 
+  print(i)
+'''
 rounds = 0
 while rounds < 20:
   for i in ant_tour:
@@ -502,4 +567,6 @@ while rounds < 20:
   move()
   gobble()
   rounds += 1
+
+'''
 print(necessary_points)
