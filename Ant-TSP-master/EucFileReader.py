@@ -8,7 +8,6 @@ First attempt at the ant algorithm to solve some simple TSP problems.
 Note: The TSP Matrices are fed in to this program as a full Matrix inthe form of a text file
 '''
 
-
 #Initialize all class parameters
 
 #Random Number for local trail updating
@@ -35,7 +34,6 @@ alpha = 5.0
 
 #Weight of the pheramone of the agorithm
 beta = 1.0
-
 
 x_coords = []
 y_coords = []
@@ -313,7 +311,6 @@ def move():
   active_ants = [x for x in range(len(ant_tour)) if ant_tour[x][0] == -1]
   #Pick one of the active ants at random. 
   ant_index = active_ants[randint(0, len(active_ants)-1)]
-  
   #find a list of free cities
   free_cities = [] 
 
@@ -323,18 +320,15 @@ def move():
   
   if len(free_cities) > 0:
     next_city = pickNext(free_cities, ant_index)
-    #update both lists with the values of the new city etc.
-    ant_tour[ant_index].append(next_city)
   else:
-    deconfuse(ant_index)
-  return ant_tour
+    next_city = deconfuse(ant_index)
+  
+  ant_tour[ant_index].append(next_city)
 
+'''
+Function that will deconfuse an ant (for the most part).
+'''
 def deconfuse(confused_ant):
-  '''Go through taboo list of ant_index
-     find the point closest to all other active ants.
-     Place ant on point closest to all other ants from its own taboo list.
-     maybe gobble.
-  '''
   #Generate a set of all points in the confused ant's taboo.
   possible_points = []
   possible_points = list(set(ant_tour[confused_ant]))
@@ -342,25 +336,25 @@ def deconfuse(confused_ant):
   positions = []
   #Find the positions of the remaining active ants.
   for ant in range(len(ant_tour)):
-    if not ((ant == confused_ant) and (ant_tour[ant][0] == None)):
+    if ((ant != confused_ant) and (ant_tour[ant][0] != None)):
       positions.append(ant_tour[ant][-1])
+
+  #Reduce dulpicates in the positions list.
+  cleaned_positions = list(set(positions))
   
   #For each possible point, find the sum of the distance 
   #to all other points occupied by other active ants
   possible_points_distances = []
   for visited in possible_points:
     distance_sum = 0
-    for ant_positions in positions:
+    for ant_positions in cleaned_positions:
       distance_sum += SSSD[visited][ant_positions]
     possible_points_distances.append(distance_sum)
 
   #Find the index of the minimim distance, use this point as the next city on which to place an ant
   next_city = possible_points_distances.index(min(possible_points_distances))
 
-  ant_tour[confused_ant].append(next_city)
-
-  gobble()
-
+  return next_city
 
 '''
 Method for picking random city using formula or otherwise.
@@ -444,6 +438,7 @@ def compileTaboo(excluded_ant):
 Method for one ant consiming another.
 '''
 def gobble():
+  finished = False
   active_ants = 0
   for current_ant in range(len(ant_tour) - 1):
     if ant_tour[current_ant][0] == -1:  
@@ -458,7 +453,9 @@ def gobble():
               ant_tour[next_ant][0] = None
 
   if active_ants == 1:
-    found = True
+    finished = True
+
+  return finished
 
 
 
@@ -517,26 +514,6 @@ def tourLength():
   return length
 
 
-'''
-for i in real_map:
-  print(i)
-  
-for j in count_map:
-  print(j)
-  
-for k in two_d_plane:
-  for u in k:
-    if u != None:
-      print(u)
-  print("--------------")
-
-
-
-
-
-'''
-
-
 content = readFile("eil15.tsp")
 makeHananGraph(content)
 reduceHananGraph()
@@ -546,14 +523,9 @@ ant_tour = [[] for y in range(len(necessary_points))]
 ant_tour = placeAnts()
 SSSD = shortestPathByEuclid()
 
-rounds = 0
 while not found:
-  for i in ant_tour:
-    print(i)
-  print("---------------------------------------------")
   move()
-  gobble()
-  rounds += 1
-  for j in count_map:
-    print(j)
-print(necessary_points)
+  found = gobble()
+for ants in ant_tour:
+  if (ants[0] == -1):
+    print(ants)
