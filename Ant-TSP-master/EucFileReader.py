@@ -113,11 +113,6 @@ def reduceHananGraph():
         foundDown = False 
         keep = False       
 
-        '''
-        search left, right, up and down for the next point on 
-        horizontal and vertical axes. If the next point in any direction
-        is not a steiner point keep the steiner point.
-		'''
         while (foundLeft == False and left >= 0):
           point = real_map[left][j]
           if point == 2:
@@ -267,7 +262,7 @@ def graphToMatrix():
           two_d_plane[fromPoint][toPoint] = {'length' : distance,'pheramone' : mew}
 
 
-def shortestPathByEuclid():
+def shortestPathByManhattan():
   shortest_distance = []
   total_points = len(two_d_plane)
   for i in range(total_points):
@@ -330,7 +325,7 @@ Function that will deconfuse an ant (for the most part).
 '''
 def deconfuse(confused_ant):
   #Generate a set of all points in the confused ant's taboo.
-  possible_points = []
+  possible_pointr = []
   possible_points = list(set(ant_tour[confused_ant]))
 
   positions = []
@@ -486,21 +481,20 @@ def updateTrails():
 
 '''
 Method for finding the tour length so far of an ant
-
 GIVE THIS A PARAMETER OF ANT INDEX
 '''
 def tourLength():
   for ants in ant_tour:
     if (ants[0] == -1):
-      y = [ants[i:i + 2] for i in range(1, len(ants), 2)]
+      print(ants[1:])
+      y = [ants[i:i + 2] for i in range(1, len(ants))]
       unique_edges = [y[i] for i in range(len(y)) \
                   if (y[i] not in y[i+1:] and \
-                  list(reversed(y[i])) not in y[i+1:])]
-  
+                  list(reversed(y[i])) not in y[i+1:])] 
+  print(unique_edges)
   total_length = 0
   for i in unique_edges:
     print( two_d_plane[i[0]][i[1]])
-
   return total_length
 
 
@@ -511,7 +505,7 @@ graphToMatrix()
 found = False
 ant_tour = [[] for y in range(len(necessary_points))]
 ant_tour = placeAnts()
-SSSD = shortestPathByEuclid()
+SSSD = shortestPathByManhattan()
 lengths_of_shortest_paths = []
 #for i in range(1000):
 while not found:
