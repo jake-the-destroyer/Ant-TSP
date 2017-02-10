@@ -492,6 +492,10 @@ def tourLength():
       for inx in range(len(split_index) - 1):
         z.append([c for c in ants[split_index[inx]+1:split_index[inx + 1]]])
       z[-1].append(ants[-1])
+      print(ants)
+      print("---------------------------------------------")
+      print(z)
+      print("---------------------------------------------")
       p = []
       for list_item in z:
         if(len(list_item) > 1):
@@ -502,6 +506,7 @@ def tourLength():
                 list(reversed(p[i])) not in p[i+1:] and \
                 len(p[i]) > 1)]
 
+  print(unique_edges)
   total_length = 0
   for i in unique_edges:
     print( two_d_plane[i[0]][i[1]])
@@ -512,13 +517,12 @@ content = readFile("eil15.tsp")
 makeHananGraph(content)
 reduceHananGraph()
 graphToMatrix()
+found = False
+ant_tour = [[] for y in range(len(necessary_points))]
+ant_tour = placeAnts()
 SSSD = shortestPathByManhattan()
-
+lengths_of_shortest_paths = []
 for i in range(1000):
-  found = False
-  ant_tour = [[] for y in range(len(necessary_points))]
-  ant_tour = placeAnts()
-  lengths_of_shortest_paths = []
   while not found:
     move()
     found = gobble()

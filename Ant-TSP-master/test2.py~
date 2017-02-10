@@ -20,7 +20,7 @@ print(p)
 unique_edges = [p[i] for i in range(len(p)) \
             if (p[i] not in p[i+1:] and \
   list(reversed(p[i])) not in p[i+1:] and \
-            len(p[i]) > 1)]
+             len(p[i] > 1))]
 print(unique_edges)
 
 # ([x[i] for i in range(len(x[1:])) if x[i] not in x[i + 1:] ])
