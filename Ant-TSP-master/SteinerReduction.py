@@ -35,15 +35,6 @@ alpha = 5.0
 #Weight of the pheramone of the agorithm
 beta = 1.0
 
-x_coords = []
-y_coords = []
-real_map = []
-count_map = []
-two_d_plane = []
-necessary_points = []
-
-ant_tour = []
-
 
 def readFile(libfile):
   #open the supplied file
@@ -55,8 +46,17 @@ def readFile(libfile):
 
 def makeHananGraph(content):
 
+  #Initialize lists for the following;
+
+  #List of coordinates in order divided into (index,xcoord,ycoord)
   split_list = []
-  resulting_map = []
+  
+  x_coords = []
+  y_coords = []
+  
+  #Hannan graph
+  hannan_graph = []
+  count_map = []
 
   #Make a list for each term.
   for term in content:
@@ -70,37 +70,38 @@ def makeHananGraph(content):
   #initialize a count map and real map that contains all zeros
   for x in range(max(x_coords) + 1):
     count_map.append([])
-    real_map.append([])
+    hannan_graph.append([])
     for y in range(max(y_coords) + 1):
-      real_map[x].append(0)
+      hannan_graph[x].append(0)
       count_map[x].append((0,0))
 
   #for each coordinate, if there is a city, mark a 1 in the map.
   for i in range(len(x_coords)):
-    real_map[ x_coords[i]][ y_coords[i]] = 1
+    hannan_graph[ x_coords[i]][ y_coords[i]] = 1
   
   #iterate through the mapa and find all points
-  for i in range(len(real_map)):
-    for j in range(len(real_map[i])):
-      if real_map[i][j] == 1:
+  for i in range(len(hannan_graph)):
+    for j in range(len(hannan_graph[i])):
+      if hannan_graph[i][j] == 1:
         #Find new points at the intersection of horizontal and vertical lines
         #from the already existing points on the map i.e. Find Hanan Graph
-        for h in range(len(real_map)):
-          for k in range(len(real_map[h])):
+        for h in range(len(hannan_graph)):
+          for k in range(len(hannan_graph[h])):
             #At the points of intersection create the Steiner points
-            if real_map[h][k] == 1:
-              if real_map[i][k] != 1:
-                real_map[i][k] = 2
-              if real_map[h][j] != 1:
-                real_map[h][j] = 2
+            if hannan_graph[h][k] == 1:
+              if hannan_graph[i][k] != 1:
+                hannan_graph[i][k] = 2
+              if hannan_graph[h][j] != 1:
+                hannan_graph[h][j] = 2
                 break
+  return (hannan_graph, count_map)
 
-def reduceHananGraph():
+def reduceHananGraph(hannan_graph):
   #Use the convex hull reduction algorithm to reduce the number of steiner points
-  for i in range(len(real_map)):
-    for j in range(len(real_map[i])):
+  for i in range(len(hannan_graph)):
+    for j in range(len(hannan_graph[i])):
       #If the point is a Steiner point...
-      if real_map[i][j] == 2:
+      if hannan_graph[i][j] == 2:
 
         left = (i - 1)
         right = (i + 1)
@@ -114,7 +115,7 @@ def reduceHananGraph():
         keep = False       
 
         while (foundLeft == False and left >= 0):
-          point = real_map[left][j]
+          point = hannan_graph[left][j]
           if point == 2:
             foundLeft = True
           elif point == 1:
@@ -125,8 +126,8 @@ def reduceHananGraph():
 
         if not keep:
 
-          while (foundRight == False and right < len(real_map)):
-            point = real_map[right][j]
+          while (foundRight == False and right < len(hannan_graph)):
+            point = hannan_graph[right][j]
             if point == 2:
               foundRight = True
             elif point == 1:
@@ -137,7 +138,7 @@ def reduceHananGraph():
   
           if not keep:
             while (foundUp == False and up >= 0):
-              point = real_map[i][up]
+              point = hannan_graph[i][up]
               if point == 2:
                 foundUp = True
               elif point == 1:
@@ -147,8 +148,8 @@ def reduceHananGraph():
                 up = (up - 1)
     
             if not keep:
-              while (foundDown == False and down < len(real_map[i])):
-                point = real_map[i][down]
+              while (foundDown == False and down < len(hannan_graph[i])):
+                point = hannan_graph[i][down]
                 if point == 2:
                   foundDown = True
                 elif point == 1:
@@ -165,26 +166,31 @@ def reduceHananGraph():
         if (not keep) and (foundLeft or foundRight) and (foundUp or foundDown):           
 
           if (foundLeft and foundUp):
-            if real_map[left][up] == 2:
-              real_map[i][j] = 0
+            if hannan_graph[left][up] == 2:
+              hannan_graph[i][j] = 0
           elif (foundRight and foundUp):
-            if real_map[right][up] == 2:
-              real_map[i][j] = 0
+            if hannan_graph[right][up] == 2:
+              hannan_graph[i][j] = 0
           elif (foundLeft and foundDown):
-            if real_map[left][down] == 2:
-              real_map[i][j] = 0
+            if hannan_graph[left][down] == 2:
+              hannan_graph[i][j] = 0
           elif (foundRight and foundDown):
-            if real_map[right][down] == 2:
-              real_map[i][j] = 0
+            if hannan_graph[right][down] == 2:
+              hannan_graph[i][j] = 0
 
-def graphToMatrix():
 
-  
+  return hannan_graph
+
+def graphToMatrix(hannan_graph, count_map):
+
+  two_d_plane = []
+  necessary_points = []
+
   #Assign each point in the graph an ordered number. This is used later.
   count = 0
-  for i in range(len(real_map)):
-    for j in range(len(real_map[i])):
-      coord = real_map[i][j]
+  for i in range(len(hannan_graph)):
+    for j in range(len(hannan_graph[i])):
+      coord = hannan_graph[i][j]
       if coord == 1 or coord == 2:
         count_map[i][j] = (coord,count)
         count = count +	1
@@ -195,10 +201,10 @@ def graphToMatrix():
     for j in range(count):
       two_d_plane[i].append(None)
 
-  for i in range(len(real_map)):
-    for j in range(len(real_map[i])):
-      if real_map[i][j] != 0:
-        if real_map[i][j] == 1:
+  for i in range(len(hannan_graph)):
+    for j in range(len(hannan_graph[i])):
+      if hannan_graph[i][j] != 0:
+        if hannan_graph[i][j] == 1:
           necessary_points.append(count_map[i][j][1])
 
         left = (i - 1)
@@ -212,28 +218,28 @@ def graphToMatrix():
         foundDown = False 
 
         while (foundLeft == False and left >= 0):
-          point = real_map[left][j]
+          point = hannan_graph[left][j]
           if point != 0:
             foundLeft = True
           else:
             left = left - 1
 
-        while (foundRight == False and right < len(real_map)):
-          point = real_map[right][j]
+        while (foundRight == False and right < len(hannan_graph)):
+          point = hannan_graph[right][j]
           if point != 0:
             foundRight = True
           else:
             right = right + 1
   
         while (foundUp == False and up >= 0):
-          point = real_map[i][up]
+          point = hannan_graph[i][up]
           if point != 0:
             foundUp = True
           else:
             up = (up - 1)
     
-        while (foundDown == False and down < len(real_map[i])):
-          point = real_map[i][down]
+        while (foundDown == False and down < len(hannan_graph[i])):
+          point = hannan_graph[i][down]
           if point != 0:
             foundDown = True
           else:
@@ -261,8 +267,10 @@ def graphToMatrix():
           distance = down - j
           two_d_plane[fromPoint][toPoint] = {'length' : distance,'pheramone' : mew}
 
+  return (count_map, two_d_plane, necessary_points)
 
-def shortestPathByManhattan():
+def shortestPathByManhattan(two_d_plane, count_map):
+
   shortest_distance = []
   total_points = len(two_d_plane)
   for i in range(total_points):
@@ -272,6 +280,7 @@ def shortestPathByManhattan():
   count = 0
   for i in range(len(count_map)):
     for j in range(len(count_map[i])):
+      
       if count_map[i][j][0] == 1 or count_map[i][j][0] == 2:
         
           count += 1
@@ -288,7 +297,7 @@ def shortestPathByManhattan():
 '''
 method to initially place ants on each necessary point in the graph. 
 '''
-def placeAnts():
+def placeAnts(ant_tour):
   for ant in range(0, len(ant_tour)):
     ant_tour[ant].append((-1, None))
     ant_tour[ant].append((necessary_points[ant], None))
@@ -299,60 +308,60 @@ def placeAnts():
 Method to move an ant to the next available city, based on some 
 probabilities.
 '''
-def move():
+def move(ant_tour, two_d_plane):
 
   #Generate a list of all active ants.
-  active_ants = [x for x in range(len(ant_tour)) if ant_tour[x][0] == -1]
+  active_ants = [x for x in range(len(ant_tour)) if ant_tour[x][0][0] == -1]
+  
   #Pick one of the active ants at random. 
   ant_index = active_ants[randint(0, len(active_ants)-1)]
   #find a list of free cities
   free_cities = [] 
 
-  for city in range(len(two_d_plane[ant_tour[ant_index][-1]])):
-    if two_d_plane[ant_tour[ant_index][-1]][city] != None and city not in ant_tour[ant_index]:
+  visited_cities = [x[0] for x in ant_tour[ant_index]]
+  for city in range(len(two_d_plane[ant_tour[ant_index][-1][0]])):
+    if two_d_plane[ant_tour[ant_index][-1][0]][city] != None and city not in visited_cities:
       free_cities.append(city)
-  
   if len(free_cities) > 0:
-    next_city = pickNext(free_cities, ant_index)
+    next_city = pickNext(free_cities, ant_index, two_d_plane, ant_tour)
+    current_city = ant_tour[ant_index][-1][0]
+    ant_tour[ant_index][-1] = (current_city, next_city)
+    ant_tour[ant_index].append((next_city, None))
   else:
-    next_city = deconfuse(ant_index)
-  
-  ant_tour[ant_index].append(next_city)
+    next_city = deconfuse(ant_index, ant_tour)
+    ant_tour[ant_index][-1] = ((next_city, None))
+
 
 '''
 Function that will deconfuse an ant (for the most part).
 '''
-def deconfuse(confused_ant):
+def deconfuse(confused_ant, ant_tour):
   #Generate a set of all points in the confused ant's taboo.
-  possible_points = list(set(ant_tour[confused_ant]))
+  possible_points = list(set(ant_tour[confused_ant][1:][0]))
 
   positions = []
   #Find the positions of the remaining active ants.
   for ant in range(len(ant_tour)):
-    if ((ant != confused_ant) and (ant_tour[ant][0] != None)):
-      positions.append(ant_tour[ant][-1])
+    if ((ant != confused_ant) and (ant_tour[ant][0][0] != None)):
+      positions.append(ant_tour[ant][-1][0])
 
-  #Reduce dulpicates in the positions list.
-  cleaned_positions = list(set(positions))
-  
   #For each possible point, find the sum of the distance 
   #to all other points occupied by other active ants
   possible_points_distances = []
   for visited in possible_points:
     distance_sum = 0
-    for ant_positions in cleaned_positions:
+    for ant_positions in positions:
       distance_sum += SSSD[visited][ant_positions]
     possible_points_distances.append(distance_sum)
-
   #Find the index of the minimim distance, use this point as the next city on which to place an ant
-  next_city = possible_points_distances.index(min(possible_points_distances))
-  ant_tour[confused_ant].append(-2)
+  next_city = possible_points[possible_points_distances.index(min(possible_points_distances))]
+
   return next_city
 
 '''
 Method for picking random city using formula or otherwise.
 '''
-def pickNext(free_cities, ant_index):
+def pickNext(free_cities, ant_index, two_d_plane, ant_tour):
   #Randomly pick a totally random path...
   if randint(0, 100) <= random_prob:
     next_city_index = (randint(0, (len(free_cities) - 1)))
@@ -369,7 +378,7 @@ def pickNext(free_cities, ant_index):
     #Initialize the trail intensity for the next trail
     total_prime_trail_intensity = 0.0
     #let the current city be last element in the list of places the ant has visited
-    current_city = ant_tour[ant_index][-1]
+    current_city = ant_tour[ant_index][-1][0]
     #Find the values for the denominator - Pheramone of all unvisited cities from current node & pheramone
     for i in free_cities:
       sigma = 0
@@ -423,7 +432,7 @@ def compileTaboo(excluded_ant):
   for ant in ant_tour:
     if not ant == ant_tour[excluded_ant]:
       for place in ant[1:]:
-        fresh_travels.append(place)
+        fresh_travels.append(place[0])
   return list(set(fresh_travels))
       
 
@@ -434,20 +443,23 @@ def gobble():
   finished = False
   active_ants = 0
   for current_ant in range(len(ant_tour) - 1):
-    if ant_tour[current_ant][0] == -1:  
+    #print(ant_tour[current_ant][0][0])
+    if ant_tour[current_ant][0][0] == -1:  
       active_ants += 1
 
       for next_ant in range(current_ant + 1, len(ant_tour)):
-        if ant_tour[next_ant][0] == -1:
-          cacc = ant_tour[current_ant][-1]
-          nacc = ant_tour[next_ant][-1]
+        if ant_tour[next_ant][0][0] == -1:
+          cacc = ant_tour[current_ant][-1][0]
+          nacc = ant_tour[next_ant][-1][0]
           if (cacc == nacc):
+
+              ant_tour[current_ant].pop()
               ant_tour[current_ant] = ant_tour[current_ant] + ant_tour[next_ant][1:-1]
-              ant_tour[next_ant][0] = None
+              ant_tour[next_ant][0] = (None, None)
 
   if active_ants == 1:
     finished = True
-
+  #print(active_ants)
   return finished
 
 
@@ -483,48 +495,50 @@ GIVE THIS A PARAMETER OF ANT INDEX
 '''
 def tourLength():
   for ants in ant_tour:
-    if (ants[0] == -1):
-      split_index = [0]
-      split_index += [y for y in range(len(ants)) if ants[y] == -2]
-      split_index.append(-1)
-      z = []
-      for inx in range(len(split_index) - 1):
-        z.append([c for c in ants[split_index[inx]+1:split_index[inx + 1]]])
-      z[-1].append(ants[-1])
-      p = []
-      for list_item in z:
-        if(len(list_item) > 1):
-          y = [list_item[i:i+2] for i in range(0, len(list_item))]
-          p = p + y
-          unique_edges = [p[i] for i in range(len(p)) \
-            if (p[i] not in p[i+1:] and \
-                list(reversed(p[i])) not in p[i+1:] and \
-                len(p[i]) > 1)]
+    if (ants[0][0] == -1):
+        unique_edges = [ants[i] for i in range(len(ants)) \
+                if (ants[i] not in ants[i+1:] and \
+                reversed(ants[i]) not in ants[i+1:])]
+  print(unique_edges)
 
   total_length = 0
-  for i in unique_edges:
-    print( two_d_plane[i[0]][i[1]])
+  #for i in unique_edges:
+    #print( two_d_plane[i[0]][i[1]])
   return total_length
 
 
 content = readFile("eil15.tsp")
-makeHananGraph(content)
-reduceHananGraph()
-graphToMatrix()
-SSSD = shortestPathByManhattan()
 
-#for i in range(1000):
-found = False
-ant_tour = [[] for y in range(len(necessary_points))]
-ant_tour = placeAnts()
+hannan_graph, count_map = makeHananGraph(content)
+
+hannan_graph = reduceHananGraph(hannan_graph)
+
+count_map, two_d_plane, necessary_points = graphToMatrix(hannan_graph, count_map)
+
+SSSD = shortestPathByManhattan(two_d_plane, count_map)
+
+length_of_shortest_path = 1000000000
+
+for i in range(10):
+
+  found = False
+  ant_tour = []
+  ant_tour = [[] for y in range(len(necessary_points))]
+  ant_tour = placeAnts(ant_tour)
+
+  while not found:
+    move(ant_tour, two_d_plane)
+    found = gobble()
+  print("here")
+  length_of_shortest_path = min(tourLength(), length_of_shortest_path)
+  #print(length_of_shortest_path)
+
 for i in ant_tour:
+  if i[0][0] == -1:
+    print(i)
+for i in count_map:
   print(i)
-print(necessary_points)
 '''
-lengths_of_shortest_paths = []
-while not found:
-  move()
-  found = gobble()
 lengths_of_shortest_paths.append(tourLength())
 
 print(min(lengths_of_shortest_paths))
