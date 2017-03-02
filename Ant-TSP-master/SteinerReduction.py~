@@ -487,7 +487,7 @@ def tourLength():
   return total_length, unique_edges
 
 
-content = readFile("eil51.tsp")
+content = readFile("att48.tsp")
 
 hannan_graph, count_map = makeHananGraph(content)
 
@@ -498,8 +498,9 @@ count_map, two_d_plane, necessary_points = graphToMatrix(hannan_graph, count_map
 SSSD = shortestPathByManhattan(two_d_plane, count_map)
 
 length_of_shortest_path = 1000000000
+smallest_tree = []
 
-for i in range(500):
+for i in range(100):
   ant_tour = []
   ant_tour = [[] for y in range(len(necessary_points))]
   ant_tour = placeAnts(ant_tour)
@@ -511,17 +512,9 @@ for i in range(500):
   tree_cost, unique_edges = tourLength()
   updateTrails(tree_cost, unique_edges)
 
-  length_of_shortest_path = min(tree_cost, length_of_shortest_path)
-  print(length_of_shortest_path)
-
-for i in two_d_plane:
-  for j in i:
-    if j != None:
-      print(j)
-'''
-lengths_of_shortest_paths.append(tourLength())
-
-print(min(lengths_of_shortest_paths))
-for p in count_map:
-  print(p)
-'''  
+  if tree_cost < length_of_shortest_path:
+    length_of_shortest_path = tree_cost
+    smallest_tree = unique_edges
+  
+print(length_of_shortest_path)
+print(unique_edges)
