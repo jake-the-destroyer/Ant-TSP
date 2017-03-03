@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 from random  import *
 import math
 ''' 
@@ -185,13 +185,24 @@ def graphToMatrix(hannan_graph, count_map):
 
   two_d_plane = []
   necessary_points = []
+  x1_coords = []
+  y1_coords = []
+  x2_coords = []
+  y2_coords = []
 
   #Assign each point in the graph an ordered number. This is used later.
   count = 0
   for i in range(len(hannan_graph)):
     for j in range(len(hannan_graph[i])):
       coord = hannan_graph[i][j]
-      if coord == 1 or coord == 2:
+      if coord == 1: 
+        x1_coords.append(i)
+        y1_coords.append(j)
+        count_map[i][j] = (coord,count)
+        count = count +	1
+      elif coord == 2:
+        x2_coords.append(i)
+        y2_coords.append(j)
         count_map[i][j] = (coord,count)
         count = count +	1
 
@@ -267,7 +278,7 @@ def graphToMatrix(hannan_graph, count_map):
           distance = down - j
           two_d_plane[fromPoint][toPoint] = {'length' : distance,'pheramone' : mew}
 
-  return (count_map, two_d_plane, necessary_points)
+  return (count_map, two_d_plane, necessary_points, x1_coords, x2_coords, y1_coords, y2_coords)
 
 def shortestPathByManhattan(two_d_plane, count_map):
 
@@ -487,20 +498,22 @@ def tourLength():
   return total_length, unique_edges
 
 
-content = readFile("att48.tsp")
 
+content = readFile("eil51.tsp")
 hannan_graph, count_map = makeHananGraph(content)
 
 hannan_graph = reduceHananGraph(hannan_graph)
 
-count_map, two_d_plane, necessary_points = graphToMatrix(hannan_graph, count_map)
+count_map, two_d_plane, necessary_points, x1_coords, x2_coords, y1_coords, y2_coords  \
+                     = graphToMatrix(hannan_graph, count_map)
 
 SSSD = shortestPathByManhattan(two_d_plane, count_map)
+
 
 length_of_shortest_path = 1000000000
 smallest_tree = []
 
-for i in range(100):
+for i in range(50):
   ant_tour = []
   ant_tour = [[] for y in range(len(necessary_points))]
   ant_tour = placeAnts(ant_tour)
@@ -516,5 +529,34 @@ for i in range(100):
     length_of_shortest_path = tree_cost
     smallest_tree = unique_edges
   
-print(length_of_shortest_path)
-print(unique_edges)
+plt.scatter(x1_coords, y1_coords, c='b')
+plt.scatter(x2_coords, y2_coords, c='r')
+
+from_path_point = []
+to_path_point = []
+hi = 0
+for i in unique_edges:
+  print(i)
+  found_x = False
+  found_y = False
+  for j in range(len(count_map)):
+    limit = len(count_map[j])
+    k = 0
+    while k < (limit):
+      if count_map[j][k][1] == i[1] and not found_x:
+        print('here')
+        from_path_point.append([j, k])
+        found_x = True
+
+      if count_map[j][k][1] == i[0] and not found_y:
+        print('there')
+        to_path_point.append([j, k])
+        found_y = True
+      k += 1
+
+
+print(len(unique_edges), len(to_path_point), len(from_path_point))
+for point in range(len(from_path_point)):
+  plt.plot([from_path_point[point][0], to_path_point[point][0]], \
+           [from_path_point[point][1], to_path_point[point][1]])
+plt.show()
