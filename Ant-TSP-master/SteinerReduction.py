@@ -54,6 +54,7 @@ def makeHananGraph(content):
   x_coords = []
   y_coords = []
   
+
   #Hannan graph
   hannan_graph = []
   count_map = []
@@ -94,6 +95,9 @@ def makeHananGraph(content):
               if hannan_graph[h][j] != 1:
                 hannan_graph[h][j] = 2
                 break
+  
+  #print (hannan_graph) 
+  #print(count_map)
   return (hannan_graph, count_map)
 
 def reduceHananGraph(hannan_graph):
@@ -178,7 +182,7 @@ def reduceHananGraph(hannan_graph):
             if hannan_graph[right][down] == 2:
               hannan_graph[i][j] = 0
 
-
+  #print(hannan_graph)
   return hannan_graph
 
 def graphToMatrix(hannan_graph, count_map):
@@ -499,7 +503,7 @@ def tourLength():
 
 
 
-content = readFile("eil51.tsp")
+content = readFile("eil15.tsp")
 hannan_graph, count_map = makeHananGraph(content)
 
 hannan_graph = reduceHananGraph(hannan_graph)
@@ -507,13 +511,15 @@ hannan_graph = reduceHananGraph(hannan_graph)
 count_map, two_d_plane, necessary_points, x1_coords, x2_coords, y1_coords, y2_coords  \
                      = graphToMatrix(hannan_graph, count_map)
 
+#print(count_map)
+#print(two_d_plane)
 SSSD = shortestPathByManhattan(two_d_plane, count_map)
 
 
 length_of_shortest_path = 1000000000
 smallest_tree = []
 
-for i in range(50):
+for i in range(1):
   ant_tour = []
   ant_tour = [[] for y in range(len(necessary_points))]
   ant_tour = placeAnts(ant_tour)
@@ -528,7 +534,10 @@ for i in range(50):
   if tree_cost < length_of_shortest_path:
     length_of_shortest_path = tree_cost
     smallest_tree = unique_edges
-  
+
+for i in ant_tour:
+  print(i)
+
 plt.scatter(x1_coords, y1_coords, c='b')
 plt.scatter(x2_coords, y2_coords, c='r')
 
@@ -536,7 +545,7 @@ from_path_point = []
 to_path_point = []
 hi = 0
 for i in unique_edges:
-  print(i)
+  #print(i)
   found_x = False
   found_y = False
   for j in range(len(count_map)):
@@ -544,12 +553,10 @@ for i in unique_edges:
     k = 0
     while k < (limit):
       if count_map[j][k][1] == i[1] and not found_x:
-        print('here')
         from_path_point.append([j, k])
         found_x = True
 
       if count_map[j][k][1] == i[0] and not found_y:
-        print('there')
         to_path_point.append([j, k])
         found_y = True
       k += 1

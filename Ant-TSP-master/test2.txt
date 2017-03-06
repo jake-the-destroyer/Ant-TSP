@@ -1,0 +1,38 @@
+[[(0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)], 
+[(0, 0), (1, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (2, 1), (0, 0), (2, 2)], 
+[(0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)], 
+[(0, 0), (2, 3), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (2, 4), (2, 5), (1, 6)], 
+[(0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)], 
+[(0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (2, 7), (1, 8), (2, 9)], 
+[(0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)], 
+[(0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)], 
+[(0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)], 
+[(0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)], 
+[(0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)], 
+[(0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)], 
+[(0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)], 
+[(0, 0), (2, 10), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (1, 11), (2, 12), (2, 13)]
+
+
+
+]
+
+[[None, {'length': 6, 'pheramone': 1.0}, None, {'length': 2, 'pheramone': 1.0}, None, None, None, None, None, None, None, None, None, None], 
+
+[{'length': 6, 'pheramone': 1.0}, None, {'length': 2, 'pheramone': 1.0}, None, {'length': 2, 'pheramone': 1.0}, None, None, None, None, None, None, None, None, None], 
+
+
+[None, {'length': 2, 'pheramone': 1.0}, None, None, None, None, {'length': 2, 'pheramone': 1.0}, None, None, None, None, None, None, None], 
+
+[{'length': 2, 'pheramone': 1.0}, None, None, None, {'length': 6, 'pheramone': 1.0}, None, None, None, None, None, {'length': 10, 'pheramone': 1.0}, None, None, None], 
+
+[None, {'length': 2, 'pheramone': 1.0}, None, {'length': 6, 'pheramone': 1.0}, None, {'length': 1, 'pheramone': 1.0}, None, {'length': 2, 'pheramone': 1.0}, None, None, None, None, None, None], 
+[None, None, None, None, {'length': 1, 'pheramone': 1.0}, None, {'length': 1, 'pheramone': 1.0}, None, {'length': 2, 'pheramone': 1.0}, None, None, None, None, None], 
+[None, None, {'length': 2, 'pheramone': 1.0}, None, None, {'length': 1, 'pheramone': 1.0}, None, None, None, {'length': 2, 'pheramone': 1.0}, None, None, None, None], 
+[None, None, None, None, {'length': 2, 'pheramone': 1.0}, None, None, None, {'length': 1, 'pheramone': 1.0}, None, None, {'length': 8, 'pheramone': 1.0}, None, None], 
+[None, None, None, None, None, {'length': 2, 'pheramone': 1.0}, None, {'length': 1, 'pheramone': 1.0}, None, {'length': 1, 'pheramone': 1.0}, None, None, {'length': 8, 'pheramone': 1.0}, None], 
+[None, None, None, None, None, None, {'length': 2, 'pheramone': 1.0}, None, {'length': 1, 'pheramone': 1.0}, None, None, None, None, {'length': 8, 'pheramone': 1.0}], 
+[None, None, None, {'length': 10, 'pheramone': 1.0}, None, None, None, None, None, None, None, {'length': 6, 'pheramone': 1.0}, None, None], 
+[None, None, None, None, None, None, None, {'length': 8, 'pheramone': 1.0}, None, None, {'length': 6, 'pheramone': 1.0}, None, {'length': 1, 'pheramone': 1.0}, None], 
+[None, None, None, None, None, None, None, None, {'length': 8, 'pheramone': 1.0}, None, None, {'length': 1, 'pheramone': 1.0}, None, {'length': 1, 'pheramone': 1.0}], 
+[None, None, None, None, None, None, None, None, None, {'length': 8, 'pheramone': 1.0}, None, None, {'length': 1, 'pheramone': 1.0}, None]]
