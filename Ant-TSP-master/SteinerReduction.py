@@ -529,6 +529,7 @@ SSSD = shortestPathByManhattan(two_d_plane, count_map)
 
 length_of_shortest_path = 1000000000
 smallest_tree = []
+tree_costs = [0]
 
 for i in range(100):
   ant_tour = []
@@ -543,10 +544,17 @@ for i in range(100):
   tree_cost, unique_edges = tourLength()
   updateTrails(tree_cost, unique_edges)
 
+  tree_costs.append(tree_costs[-1] + tree_cost)
+
   if tree_cost < length_of_shortest_path:
     length_of_shortest_path = tree_cost
-    smallest_tree = unique_edges
-
+    smallest_tree = unique_edges 
+ 
+cumsum = []
+for i in range(1, len(tree_costs)):
+  cumsum.append(tree_costs[i] / i)
+  
+print(cumsum)
 plt.scatter(x1_coords, y1_coords, c='b')
 plt.scatter(x2_coords, y2_coords, c='r')
 
