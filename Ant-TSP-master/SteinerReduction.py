@@ -465,8 +465,18 @@ def gobble(current_ant, total_ants):
       nacc = ant_tour[next_ant][-1][0]
       if (cacc == nacc):
           total_ants -= 1
-          ant_tour[current_ant].pop()
-          ant_tour[current_ant] = ant_tour[current_ant] + ant_tour[next_ant][1:-1]
+          ca = ant_tour[current_ant][1:]
+          na = ant_tour[next_ant]
+          cavc = [i[0] for i in ca]
+          navc = [i[0] for i in na] 
+          gobble_edges = [na[i] for i in range(1, len(na)) \
+                      if ((na[i] not in ca) and \
+                (reversed(na[i]) not in ca) and \
+                        (navc[i] not in cavc))]
+          #print(gobble_edges)
+          current_position = ant_tour[current_ant].pop()
+          ant_tour[current_ant] = ant_tour[current_ant] + gobble_edges 
+          ant_tour[current_ant].append(current_position)
           ant_tour[next_ant][0] = (None, None)
 
   return total_ants
@@ -493,8 +503,9 @@ GIVE THIS A PARAMETER OF ANT INDEX
 def tourLength():
   for ants in ant_tour:
     if (ants[0][0] == -1):
+        ants.pop()
         unique_edges = [ants[i] for i in range(1, len(ants)) \
-                if (ants[i] not in ants[i+1:] and \
+                      if (ants[i] not in ants[i+1:] and \
                 reversed(ants[i]) not in ants[i+1:])]
   total_length = 0
   for i in unique_edges:
@@ -503,7 +514,7 @@ def tourLength():
 
 
 
-content = readFile("eil15.tsp")
+content = readFile("eil51.tsp")
 hannan_graph, count_map = makeHananGraph(content)
 
 hannan_graph = reduceHananGraph(hannan_graph)
@@ -519,7 +530,7 @@ SSSD = shortestPathByManhattan(two_d_plane, count_map)
 length_of_shortest_path = 1000000000
 smallest_tree = []
 
-for i in range(1):
+for i in range(100):
   ant_tour = []
   ant_tour = [[] for y in range(len(necessary_points))]
   ant_tour = placeAnts(ant_tour)
@@ -528,15 +539,13 @@ for i in range(1):
   while total_ants > 1:
     total_ants = move(ant_tour, two_d_plane, total_ants)
 
+  
   tree_cost, unique_edges = tourLength()
   updateTrails(tree_cost, unique_edges)
 
   if tree_cost < length_of_shortest_path:
     length_of_shortest_path = tree_cost
     smallest_tree = unique_edges
-
-for i in ant_tour:
-  print(i)
 
 plt.scatter(x1_coords, y1_coords, c='b')
 plt.scatter(x2_coords, y2_coords, c='r')
