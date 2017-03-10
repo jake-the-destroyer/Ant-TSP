@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 from random  import *
 import math
 ''' 
@@ -54,6 +54,7 @@ def makeHananGraph(content):
   x_coords = []
   y_coords = []
   
+
   #Hannan graph
   hannan_graph = []
   count_map = []
@@ -94,6 +95,9 @@ def makeHananGraph(content):
               if hannan_graph[h][j] != 1:
                 hannan_graph[h][j] = 2
                 break
+  
+  #print (hannan_graph) 
+  #print(count_map)
   return (hannan_graph, count_map)
 
 def reduceHananGraph(hannan_graph):
@@ -178,20 +182,31 @@ def reduceHananGraph(hannan_graph):
             if hannan_graph[right][down] == 2:
               hannan_graph[i][j] = 0
 
-
+  #print(hannan_graph)
   return hannan_graph
 
 def graphToMatrix(hannan_graph, count_map):
 
   two_d_plane = []
   necessary_points = []
+  x1_coords = []
+  y1_coords = []
+  x2_coords = []
+  y2_coords = []
 
   #Assign each point in the graph an ordered number. This is used later.
   count = 0
   for i in range(len(hannan_graph)):
     for j in range(len(hannan_graph[i])):
       coord = hannan_graph[i][j]
-      if coord == 1 or coord == 2:
+      if coord == 1: 
+        x1_coords.append(i)
+        y1_coords.append(j)
+        count_map[i][j] = (coord,count)
+        count = count +	1
+      elif coord == 2:
+        x2_coords.append(i)
+        y2_coords.append(j)
         count_map[i][j] = (coord,count)
         count = count +	1
 
@@ -267,7 +282,7 @@ def graphToMatrix(hannan_graph, count_map):
           distance = down - j
           two_d_plane[fromPoint][toPoint] = {'length' : distance,'pheramone' : mew}
 
-  return (count_map, two_d_plane, necessary_points)
+  return (count_map, two_d_plane, necessary_points, x1_coords, x2_coords, y1_coords, y2_coords)
 
 def shortestPathByManhattan(two_d_plane, count_map):
 
@@ -450,8 +465,18 @@ def gobble(current_ant, total_ants):
       nacc = ant_tour[next_ant][-1][0]
       if (cacc == nacc):
           total_ants -= 1
-          ant_tour[current_ant].pop()
-          ant_tour[current_ant] = ant_tour[current_ant] + ant_tour[next_ant][1:-1]
+          ca = ant_tour[current_ant][1:]
+          na = ant_tour[next_ant]
+          cavc = [i[0] for i in ca]
+          navc = [i[0] for i in na] 
+          gobble_edges = [na[i] for i in range(1, len(na)) \
+                      if ((na[i] not in ca) and \
+                (reversed(na[i]) not in ca) and \
+                        (navc[i] not in cavc))]
+          #print(gobble_edges)
+          current_position = ant_tour[current_ant].pop()
+          ant_tour[current_ant] = ant_tour[current_ant] + gobble_edges 
+          ant_tour[current_ant].append(current_position)
           ant_tour[next_ant][0] = (None, None)
 
   return total_ants
@@ -478,8 +503,9 @@ GIVE THIS A PARAMETER OF ANT INDEX
 def tourLength():
   for ants in ant_tour:
     if (ants[0][0] == -1):
+        ants.pop()
         unique_edges = [ants[i] for i in range(1, len(ants)) \
-                if (ants[i] not in ants[i+1:] and \
+                      if (ants[i] not in ants[i+1:] and \
                 reversed(ants[i]) not in ants[i+1:])]
   total_length = 0
   for i in unique_edges:
@@ -487,18 +513,23 @@ def tourLength():
   return total_length, unique_edges
 
 
-content = readFile("att48.tsp")
 
+content = readFile("eil51.tsp")
 hannan_graph, count_map = makeHananGraph(content)
 
 hannan_graph = reduceHananGraph(hannan_graph)
 
-count_map, two_d_plane, necessary_points = graphToMatrix(hannan_graph, count_map)
+count_map, two_d_plane, necessary_points, x1_coords, x2_coords, y1_coords, y2_coords  \
+                     = graphToMatrix(hannan_graph, count_map)
 
+#print(count_map)
+#print(two_d_plane)
 SSSD = shortestPathByManhattan(two_d_plane, count_map)
+
 
 length_of_shortest_path = 1000000000
 smallest_tree = []
+tree_costs = [0]
 
 for i in range(100):
   ant_tour = []
@@ -509,12 +540,47 @@ for i in range(100):
   while total_ants > 1:
     total_ants = move(ant_tour, two_d_plane, total_ants)
 
+  
   tree_cost, unique_edges = tourLength()
   updateTrails(tree_cost, unique_edges)
 
+  tree_costs.append(tree_costs[-1] + tree_cost)
+
   if tree_cost < length_of_shortest_path:
     length_of_shortest_path = tree_cost
-    smallest_tree = unique_edges
+    smallest_tree = unique_edges 
+ 
+cumsum = []
+for i in range(1, len(tree_costs)):
+  cumsum.append(tree_costs[i] / i)
   
-print(length_of_shortest_path)
-print(unique_edges)
+print(cumsum)
+plt.scatter(x1_coords, y1_coords, c='b')
+plt.scatter(x2_coords, y2_coords, c='r')
+
+from_path_point = []
+to_path_point = []
+hi = 0
+for i in unique_edges:
+  #print(i)
+  found_x = False
+  found_y = False
+  for j in range(len(count_map)):
+    limit = len(count_map[j])
+    k = 0
+    while k < (limit):
+      if count_map[j][k][1] == i[1] and not found_x:
+        from_path_point.append([j, k])
+        found_x = True
+
+      if count_map[j][k][1] == i[0] and not found_y:
+        to_path_point.append([j, k])
+        found_y = True
+      k += 1
+
+
+print(len(unique_edges), len(to_path_point), len(from_path_point))
+for point in range(len(from_path_point)):
+  plt.plot([from_path_point[point][0], to_path_point[point][0]], \
+           [from_path_point[point][1], to_path_point[point][1]])
+plt.show()
