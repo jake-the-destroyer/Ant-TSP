@@ -302,20 +302,17 @@ def move(ant):
   free_cities = [] 
 
   for city in range(len(two_d_plane[ant[-1]])):
-    if two_d_plane[ant[-1]][city] != None and city not in ant:
+    if two_d_plane[ant[-1]][city] != None:
       free_cities.append(city)
-  if len(free_cities) == 0:
+  next_city = pickNext(free_cities, ant)
+  if(next_city in ant):
+    ant.append(next_city)
     ant_dead = True
   else:
-    next_city = pickNext(free_cities, ant)
-    if(next_city in ant):
-      ant_dead = True
-      print(next_city)
-      #update_trails(ant, 0)
-    else:
-      ant.append(next_city)
-      ant_dead = False
-
+    ant.append(next_city)
+    ant_dead = False
+  
+  updateTrails(ant, ant_dead)
   return ant, ant_dead
 
 
@@ -355,41 +352,45 @@ def pickNext(free_cities, ant):
      #List of probabilities of travelling to the each city
      prob_next.append(prob)
 
-   #Get the random number between 0 and the total probability
-   index_number = uniform(0.0, 1.0)
-     
-   #Initialize the current index i.e the lower bound of the probability of choosing the given city
-   current_index = 0.0
-
-   #iterate through the list of probabilities...
-   for j in range(0, len(prob_next)):
-     #upper bound for P(choosing a path)
-     next_index = prob_next[j] + current_index
-
-     if current_index <= index_number and index_number <= next_index:
-       next_city = free_cities[j]
-     current_index = next_index
+   next_city = free_cities[prob_next.index(max(prob_next))]
    return next_city
 
 '''
 Method for updating the trails of the ants.
 '''
-def updateTrails(tree_cost, unique_edges):
-  for i in range(0, len(two_d_plane)):
-    for j in range(0, len(two_d_plane)):
-      if two_d_plane[i][j] != None:
-        if ((i,j) in unique_edges):
-          included_cost = evaporation_rate * (10000/tree_cost)
-        else:
-          included_cost = 0
+def updateTrails(ant, ant_dead):
+  from_point = ant[-2]
+  to_point = ant[-1]
 
-        two_d_plane[i][j]['pheramone'] = ((1 - evaporation_rate) * two_d_plane[i][j]['pheramone']) \
-                                         + included_cost
+  if ant_dead:
+    included_cost = 0
+  else:
+    included_cost = 1 / (1 + two_d_plane[from_point][to_point]['length'])
 
+  two_d_plane[from_point][to_point]['pheramone'] = \
+          ((1 - evaporation_rate) * two_d_plane[from_point][to_point]['pheramone']) + included_cost
 
+  print(two_d_plane[from_point][to_point])
 
+'''
+Method for updating the trails of the ants.
+'''
+def updateTrailsGlobal(ant, degree_satisfied):
+  included_cost = 0
 
-
+  if degree_satisfied:
+    path_length = 0
+    for vertex in range(len(ant) - 1):
+      from_point = ant[vertex]
+      to_point = ant[vertex + 1]
+      path_length += two_d_plane[from_point][to_point]['length']
+      
+    included_cost = 1 / (1 + path_length)
+  for vertex in range(len(ant) -1):
+    from_point = ant[vertex]
+    to_point = ant[vertex + 1]
+    two_d_plane[from_point][to_point]['pheramone'] = \
+          ((1 - evaporation_rate) * two_d_plane[from_point][to_point]['pheramone']) + included_cost
 
 
 #Initialize all class parameters
@@ -434,12 +435,16 @@ destination_node = necessary_points[randint(0, len(necessary_points)-1)]
 source_node = necessary_points[randint(0, len(necessary_points)-1)]
 
 ant_tour = []
-
-ant_tour = placeAnt(ant_tour, source_node)
-ant_dead = False
-print(source_node)
-print(destination_node)
-while (not ant_dead) and (ant_tour[-1][-1] != destination_node):
-  ant_tour[-1], ant_dead = move(ant_tour[-1])
-print(ant_tour[-1])
-print(ant_dead)
+for i in range(1000):
+  ant_tour = placeAnt(ant_tour, source_node)
+  ant_dead = False
+  at_destination = False
+  print(source_node)
+  print(destination_node)
+  while (not ant_dead) and (not at_destination):
+    ant_tour[-1], ant_dead = move(ant_tour[-1])
+    at_destination = ant_tour[-1][-1] == destination_node
+  updateTrailsGlobal(ant_tour[-1], at_destination)
+  print(ant_tour[-1])
+  print(ant_dead)
+  print("----------------------------")
