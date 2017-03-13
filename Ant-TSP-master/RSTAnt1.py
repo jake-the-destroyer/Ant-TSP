@@ -522,8 +522,6 @@ hannan_graph = reduceHananGraph(hannan_graph)
 count_map, two_d_plane, necessary_points, x1_coords, x2_coords, y1_coords, y2_coords  \
                      = graphToMatrix(hannan_graph, count_map)
 
-#print(count_map)
-#print(two_d_plane)
 SSSD = shortestPathByManhattan(two_d_plane, count_map)
 
 
