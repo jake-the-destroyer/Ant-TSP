@@ -409,15 +409,20 @@ Build all of the ant trees based on the pheramone tables.
 '''
 def buildTree(tree, source, destination):
   current_node = source
-
+  visited = [current_node]
   while current_node != destination:
     prev_node = current_node
     next_nodes = []
     for i in pheramone_table[current_node][destination]:
-      next_nodes.append(i['probability'])  
+      if i['neighbor'] not in visited:
+        next_nodes.append(i['probability'])  
+      else:
+        next_nodes.append(-1)
     neighbor = next_nodes.index(max(next_nodes))
     current_node = pheramone_table[current_node][destination_node][neighbor]['neighbor']
-    tree.append((current_node, prev_node))
+    #print(current_node)
+    visited.append(current_node)
+    tree.append((prev_node,current_node))
 
   return tree
 
@@ -444,7 +449,7 @@ mew = 1.0
   #Weight of the Pheramone of the agorithm
 alpha = 5.0
 
-content = readFile("eil15.tsp")
+content = readFile("eil51.tsp")
 
 hannan_graph, count_map = makeHananGraph(content)
 
@@ -465,7 +470,7 @@ Test for the creation of the pheramone table.
 
 source_node = necessary_points[randint(0, len(necessary_points)-1)]
 necessary_points.remove(source_node)
-tree = [source_node]
+tree = []
 while len(necessary_points) > 0:
   destination_node = necessary_points[randint(0, len(necessary_points)-1)]
   necessary_points.remove(destination_node)
@@ -495,10 +500,10 @@ while len(necessary_points) > 0:
       updatePherTable(node, destination_node)
     if at_destination:
       full_paths.append(ant)
-  print(source_node)
-  print(destination_node)
-  for i in full_paths:
-    print(i)
+  #print(source_node)
+  #print(destination_node)
+  #for i in full_paths:
+    #print(i)
       #print(source_node)
      # print(destination_node)
      # print(ant_tour[-1])
@@ -507,7 +512,7 @@ while len(necessary_points) > 0:
   #print(necessary_points)
   
   tree = buildTree(tree, source_node, destination_node)
-
+  print(tree)
 plt.scatter(x1_coords, y1_coords, c='b')
 plt.scatter(x2_coords, y2_coords, c='r')
 
@@ -516,7 +521,7 @@ from_path_point = []
 to_path_point = []
 hi = 0
 for i in tree:
-  #print(i)
+  print(i)
   found_x = False
   found_y = False
   for j in range(len(count_map)):
@@ -533,7 +538,6 @@ for i in tree:
       k += 1
 
 
-print(len(unique_edges), len(to_path_point), len(from_path_point))
 for point in range(len(from_path_point)):
   plt.plot([from_path_point[point][0], to_path_point[point][0]], \
            [from_path_point[point][1], to_path_point[point][1]])
