@@ -1,13 +1,12 @@
 #!/usr/bin/python
 
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 from random  import *
 import math
-''' 
-First attempt at the ant algorithm to solve some simple TSP problems.  
-Note: The TSP Matrices are fed in to this program as a full Matrix inthe form of a text file
-'''
 
+'''
+Method for picking random city using formula or otherwise.
+'''
 def readFile(libfile):
   #open the supplied file
   with open(libfile) as f:
@@ -16,16 +15,15 @@ def readFile(libfile):
     f.close()
     return content
 
+'''
+Method for picking random city using formula or otherwise.
+'''
 def makeHananGraph(content):
-
-  #Initialize lists for the following;
 
   #List of coordinates in order divided into (index,xcoord,ycoord)
   split_list = []
-
   x_coords = []
   y_coords = []
-
 
   #Hannan graph
   hannan_graph = []
@@ -68,10 +66,11 @@ def makeHananGraph(content):
                 hannan_graph[h][j] = 2
                 break
 
-  #print (hannan_graph) 
-  #print(count_map)
   return (hannan_graph, count_map)
 
+'''
+Method for picking random city using formula or otherwise.
+'''
 def reduceHananGraph(hannan_graph):
   #Use the convex hull reduction algorithm to reduce the number of steiner points
   for i in range(len(hannan_graph)):
@@ -154,10 +153,11 @@ def reduceHananGraph(hannan_graph):
             if hannan_graph[right][down] == 2:
               hannan_graph[i][j] = 0
 
-  #print(hannan_graph)
   return hannan_graph
 
-
+'''
+Method for picking random city using formula or otherwise.
+'''
 def graphToMatrix(hannan_graph, count_map):
 
   two_d_plane = []
@@ -262,49 +262,99 @@ def graphToMatrix(hannan_graph, count_map):
   return (count_map, two_d_plane, necessary_points, node_degree, x1_coords, x2_coords, y1_coords, y2_coords)
   
 
-def shortestPathByManhattan(two_d_plane, count_map):
+'''
+Method for creating the node's pheramone table.
+'''
+def createPheramoneTable(two_d_plane, node_degree):
+  length = len(two_d_plane)
+  node_table = []
+  #for each node, create a 2d table
+  for node in range(length):
+    node_table.append([])
 
-  shortest_distance = []
-  total_points = len(two_d_plane)
-  for i in range(total_points):
-    shortest_distance.append([])
-    for j in range(total_points):
-      shortest_distance[i].append(None)
-  count = 0
-  for i in range(len(count_map)):
-    for j in range(len(count_map[i])):
+    #create a row for all possible destinations.
+    for destination in range(length):
+      node_table[node].append([])
       
-      if count_map[i][j][0] == 1 or count_map[i][j][0] == 2:
+      #Append n probabilities, where n is a neighbor of a given node.
+      for neighbor in range(length):
+        if two_d_plane[node][neighbor] != None:
+          prob = round((1.0/node_degree[node]), 2)
+          node_table[node][destination].append(
+                 {'neighbor' : neighbor, 'probability' : prob})
         
-          count += 1
-          for k in range(len(count_map)):
-            for l in range(len(count_map[k])):
-              if count_map[k][l][0] == 1 or count_map[k][l][0] == 2:
-                shortest_distance[count_map[i][j][1]][count_map[k][l][1]] = \
-                        abs(i - k) +  abs(j - l)
+  return node_table
 
-  return shortest_distance
+'''
+Method for calculating the probabilities for the pheramone tables. 
+'''
+def updatePherTable(node, destination):
 
-def placeAnt(ant_tour, source_node):
-  ant_tour.append([])
-  ant_tour[-1].append(source_node)
-  return ant_tour
+  prob = round((1.0/node_degree[node]), 2)
+ 
+
+  #Initialize denominator variable
+  denominator = 0.000001 
+  #Make a list of the probabilites to go to the next city
+  prob_next = []
+  #Initialize total cost of the trails
+  total_cost_of_trails = 0.0
+  #Initialize the trail intensity for the next trail
+  total_prime_trail_intensity = 0.0
+  #Find the values for the denominator - Pheramone of all unvisited cities from current node & pheramone
+  for i in pheramone_table[node][destination]:
+    neighbor = i['neighbor']
+    from_point = min(node, neighbor)
+    to_point = max(node, neighbor)
+    
+    trail_cost = two_d_plane[from_point ][to_point ]['length']
+    pheramone = two_d_plane[from_point ][to_point ]['pheramone']
+
+    total_cost_of_trails = pow((1.0 / (trail_cost)), alpha)
+    total_prime_trail_intensity = pheramone
+
+    denominator += total_cost_of_trails * total_prime_trail_intensity
+
+  #for each free city....
+  for i in pheramone_table[node][destination]:
+    neighbor = i['neighbor']
+    from_point = min(node, neighbor)
+    to_point = max(node, neighbor)
+    
+    trail_cost = two_d_plane[from_point][to_point]['length']
+    pheramone = two_d_plane[from_point][to_point]['pheramone']
+
+    #Let the numerator be the current city to the power of alpha by the current 
+    numerator = (pow(( 1.0 / (trail_cost)), alpha)) * (pheramone)
+    prob = numerator / denominator
+    i['probability'] = round(prob, 2)
 
 
+'''
+Method for placing an ant on a source node. 
+'''
+def placeAnt(source_node):
+  ant = []
+  ant.append(source_node)
+  return ant
 
 '''
 Method to move an ant to the next available city, based on some 
 probabilities.
 '''
-def move(ant):
+def move(ant, destination):
 
-  #find a list of free cities
-  free_cities = [] 
+  #mark the current node.
+  current_node = ant[-1]
+  next_nodes = []
 
-  for city in range(len(two_d_plane[ant[-1]])):
-    if two_d_plane[ant[-1]][city] != None:
-      free_cities.append(city)
-  next_city = pickNext(free_cities, ant)
+  #Create a list of the probability of moving to any on of the 
+  #neighbors of the current node for the given destination.
+  for neighbor in pheramone_table[current_node][destination_node]:
+    next_nodes.append(neighbor['probability'])
+
+  neighbor = next_nodes.index(max(next_nodes))
+  next_city = pheramone_table[current_node][destination_node][neighbor]['neighbor']
   if(next_city in ant):
     ant.append(next_city)
     ant_dead = True
@@ -317,50 +367,11 @@ def move(ant):
 
 
 '''
-Method for picking random city using formula or otherwise.
-'''
-def pickNext(free_cities, ant):
-
-   #Initialize denominator variable
-   denominator = 0.0 
-   #Make a list of the probabilites to go to the next city
-   prob_next = []
-   #Initialize total cost of the trails
-   total_cost_of_trails = 0.0
-   #Initialize the trail intensity for the next trail
-   total_prime_trail_intensity = 0.0
-   #let the current city be last element in the list of places the ant has visited
-   current_city = ant[-1]
-   #Find the values for the denominator - Pheramone of all unvisited cities from current node & pheramone
-   for i in free_cities:
-     trail_cost = two_d_plane[current_city][i]['length']
-     pheramone = two_d_plane[current_city][i]['pheramone']
-
-     total_cost_of_trails = pow((1.0 / (trail_cost)), alpha)
-     total_prime_trail_intensity = pheramone
-
-     denominator += total_cost_of_trails * total_prime_trail_intensity
-
-   #for each free city....
-   for i in free_cities:
-     trail_cost = two_d_plane[current_city][i]['length']
-     pheramone = two_d_plane[current_city][i]['pheramone']
-
-     #Let the numerator be the current city to the power of alpha by the current 
-     numerator = (pow(( 1.0 / (trail_cost)), alpha)) * (pheramone)
-     prob = numerator / denominator
-     #List of probabilities of travelling to the each city
-     prob_next.append(prob)
-
-   next_city = free_cities[prob_next.index(max(prob_next))]
-   return next_city
-
-'''
 Method for updating the trails of the ants.
 '''
 def updateTrails(ant, ant_dead):
-  from_point = ant[-2]
-  to_point = ant[-1]
+  from_point = min(ant[-2], ant[-1])
+  to_point = max(ant[-2], ant[-1])
 
   if ant_dead:
     included_cost = 0
@@ -370,7 +381,7 @@ def updateTrails(ant, ant_dead):
   two_d_plane[from_point][to_point]['pheramone'] = \
           ((1 - evaporation_rate) * two_d_plane[from_point][to_point]['pheramone']) + included_cost
 
-  print(two_d_plane[from_point][to_point])
+  #print(two_d_plane[from_point][to_point])
 
 '''
 Method for updating the trails of the ants.
@@ -387,11 +398,28 @@ def updateTrailsGlobal(ant, degree_satisfied):
       
     included_cost = 1 / (1 + path_length)
   for vertex in range(len(ant) -1):
-    from_point = ant[vertex]
-    to_point = ant[vertex + 1]
+    from_point = min(ant[vertex], ant[vertex + 1])
+    to_point = max(ant[vertex], ant[vertex + 1])
     two_d_plane[from_point][to_point]['pheramone'] = \
           ((1 - evaporation_rate) * two_d_plane[from_point][to_point]['pheramone']) + included_cost
 
+
+'''
+Build all of the ant trees based on the pheramone tables.
+'''
+def buildTree(tree, source, destination):
+  current_node = source
+
+  while current_node != destination:
+    prev_node = current_node
+    next_nodes = []
+    for i in pheramone_table[current_node][destination]:
+      next_nodes.append(i['probability'])  
+    neighbor = next_nodes.index(max(next_nodes))
+    current_node = pheramone_table[current_node][destination_node][neighbor]['neighbor']
+    tree.append((current_node, prev_node))
+
+  return tree
 
 #Initialize all class parameters
 
@@ -416,7 +444,7 @@ mew = 1.0
   #Weight of the Pheramone of the agorithm
 alpha = 5.0
 
-content = readFile("eil51.tsp")
+content = readFile("eil15.tsp")
 
 hannan_graph, count_map = makeHananGraph(content)
 
@@ -425,26 +453,89 @@ hannan_graph = reduceHananGraph(hannan_graph)
 count_map, two_d_plane, necessary_points, node_degree, x1_coords, x2_coords, y1_coords, y2_coords  \
                      = graphToMatrix(hannan_graph, count_map)
 
-SSSD = shortestPathByManhattan(two_d_plane, count_map)
+pheramone_table = createPheramoneTable(two_d_plane, node_degree)
+'''
+Test for the creation of the pheramone table.
 
+#for node in pheramone_table:
+#  for destination in node:
+#    for neighbor in destination:
+#      print(neighbor)
+'''
 
-length_of_shortest_path = 1000000000
-smallest_tree = []
-tree_costs = [0]
-destination_node = necessary_points[randint(0, len(necessary_points)-1)]
 source_node = necessary_points[randint(0, len(necessary_points)-1)]
-
-ant_tour = []
-for i in range(1000):
-  ant_tour = placeAnt(ant_tour, source_node)
-  ant_dead = False
-  at_destination = False
+necessary_points.remove(source_node)
+tree = [source_node]
+while len(necessary_points) > 0:
+  destination_node = necessary_points[randint(0, len(necessary_points)-1)]
+  necessary_points.remove(destination_node)
+  full_paths = []
+  for i in range(100):
+    ant = placeAnt(source_node)
+  
+  
+    '''
+    Test to check whether the ant is placed correctly.
+    
+    print(source_node)
+    print(destination_node)
+    print(ant)
+    '''
+  
+  
+    ant_dead = False
+    at_destination = False
+    while (not ant_dead) and (not at_destination):
+      at_destination = ant[-1] == destination_node
+      if( not at_destination):
+        ant, ant_dead = move(ant, destination_node)
+  
+    updateTrailsGlobal(ant, True)
+    for node in ant:
+      updatePherTable(node, destination_node)
+    if at_destination:
+      full_paths.append(ant)
   print(source_node)
   print(destination_node)
-  while (not ant_dead) and (not at_destination):
-    ant_tour[-1], ant_dead = move(ant_tour[-1])
-    at_destination = ant_tour[-1][-1] == destination_node
-  updateTrailsGlobal(ant_tour[-1], at_destination)
-  print(ant_tour[-1])
-  print(ant_dead)
-  print("----------------------------")
+  for i in full_paths:
+    print(i)
+      #print(source_node)
+     # print(destination_node)
+     # print(ant_tour[-1])
+     # print(ant_dead)
+     # print("----------------------------")
+  #print(necessary_points)
+  
+  tree = buildTree(tree, source_node, destination_node)
+
+plt.scatter(x1_coords, y1_coords, c='b')
+plt.scatter(x2_coords, y2_coords, c='r')
+
+
+from_path_point = []
+to_path_point = []
+hi = 0
+for i in tree:
+  #print(i)
+  found_x = False
+  found_y = False
+  for j in range(len(count_map)):
+    limit = len(count_map[j])
+    k = 0
+    while k < (limit):
+      if count_map[j][k][1] == i[1] and not found_x:
+        from_path_point.append([j, k])
+        found_x = True
+
+      if count_map[j][k][1] == i[0] and not found_y:
+        to_path_point.append([j, k])
+        found_y = True
+      k += 1
+
+
+print(len(unique_edges), len(to_path_point), len(from_path_point))
+for point in range(len(from_path_point)):
+  plt.plot([from_path_point[point][0], to_path_point[point][0]], \
+           [from_path_point[point][1], to_path_point[point][1]])
+
+plt.show()
