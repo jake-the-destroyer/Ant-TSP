@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from random  import *
 import math
 
@@ -449,7 +449,7 @@ mew = 1.0
   #Weight of the Pheramone of the agorithm
 alpha = 5.0
 
-content = readFile("eil51.tsp")
+content = readFile("eil15.tsp")
 
 hannan_graph, count_map = makeHananGraph(content)
 
@@ -513,8 +513,8 @@ while len(necessary_points) > 0:
   
   tree = buildTree(tree, source_node, destination_node)
   print(tree)
-plt.scatter(x1_coords, y1_coords, c='b')
-plt.scatter(x2_coords, y2_coords, c='r')
+#plt.scatter(x1_coords, y1_coords, c='b')
+#plt.scatter(x2_coords, y2_coords, c='r')
 
 
 from_path_point = []
@@ -538,8 +538,8 @@ for i in tree:
       k += 1
 
 
-for point in range(len(from_path_point)):
-  plt.plot([from_path_point[point][0], to_path_point[point][0]], \
-           [from_path_point[point][1], to_path_point[point][1]])
+#for point in range(len(from_path_point)):
+#  plt.plot([from_path_point[point][0], to_path_point[point][0]], \
+#           [from_path_point[point][1], to_path_point[point][1]])
 
-plt.show()
+#plt.show()
