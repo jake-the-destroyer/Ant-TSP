@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from random  import *
 import math
 ''' 
@@ -514,7 +514,7 @@ def tourLength():
 
 
 
-content = readFile("eil51.tsp")
+content = readFile("a280.tsp")
 hannan_graph, count_map = makeHananGraph(content)
 
 hannan_graph = reduceHananGraph(hannan_graph)
@@ -552,10 +552,10 @@ cumsum = []
 for i in range(1, len(tree_costs)):
   cumsum.append(tree_costs[i] / i)
   
-print(cumsum)
-plt.scatter(x1_coords, y1_coords, c='b')
-plt.scatter(x2_coords, y2_coords, c='r')
-
+print(min(cumsum))
+#plt.scatter(x1_coords, y1_coords, c='b')
+#plt.scatter(x2_coords, y2_coords, c='r')
+'''
 from_path_point = []
 to_path_point = []
 hi = 0
@@ -581,4 +581,5 @@ print(len(unique_edges), len(to_path_point), len(from_path_point))
 for point in range(len(from_path_point)):
   plt.plot([from_path_point[point][0], to_path_point[point][0]], \
            [from_path_point[point][1], to_path_point[point][1]])
-plt.show()
+'''
+#plt.show()

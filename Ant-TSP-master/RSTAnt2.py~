@@ -288,46 +288,44 @@ def createPheramoneTable(two_d_plane, node_degree):
 '''
 Method for calculating the probabilities for the pheramone tables. 
 '''
-def updatePherTable(node, destination):
+def updatePherTable(destination):
 
-  prob = round((1.0/node_degree[node]), 2)
- 
+  for node in range(len(pheramone_table)):
+    #Initialize denominator variable
+    denominator = 0.000001 
+    #Make a list of the probabilites to go to the next city
+    prob_next = []
+    #Initialize total cost of the trails
+    total_cost_of_trails = 0.0
+    #Initialize the trail intensity for the next trail
+    total_prime_trail_intensity = 0.0
+    #Find the values for the denominator - Pheramone of all unvisited cities from current node & pheramone
+    for i in pheramone_table[node][destination]:
+      neighbor = i['neighbor']
+      from_point = min(node, neighbor)
+      to_point =   max(node, neighbor)
+      
+      trail_cost = two_d_plane[from_point][to_point]['length']
+      pheramone =  two_d_plane[from_point][to_point]['pheramone']
 
-  #Initialize denominator variable
-  denominator = 0.000001 
-  #Make a list of the probabilites to go to the next city
-  prob_next = []
-  #Initialize total cost of the trails
-  total_cost_of_trails = 0.0
-  #Initialize the trail intensity for the next trail
-  total_prime_trail_intensity = 0.0
-  #Find the values for the denominator - Pheramone of all unvisited cities from current node & pheramone
-  for i in pheramone_table[node][destination]:
-    neighbor = i['neighbor']
-    from_point = min(node, neighbor)
-    to_point = max(node, neighbor)
+      total_cost_of_trails = pow((1.0 / (trail_cost)), alpha)
+      total_prime_trail_intensity = pheramone
+
+      denominator += total_cost_of_trails * total_prime_trail_intensity
+
+    #for each free city....
+    for i in pheramone_table[node][destination]:
+      neighbor = i['neighbor']
+      from_point = min(node, neighbor)
+      to_point =   max(node, neighbor)
     
-    trail_cost = two_d_plane[from_point ][to_point ]['length']
-    pheramone = two_d_plane[from_point ][to_point ]['pheramone']
+      trail_cost = two_d_plane[from_point][to_point]['length']
+      pheramone =  two_d_plane[from_point][to_point]['pheramone']
 
-    total_cost_of_trails = pow((1.0 / (trail_cost)), alpha)
-    total_prime_trail_intensity = pheramone
-
-    denominator += total_cost_of_trails * total_prime_trail_intensity
-
-  #for each free city....
-  for i in pheramone_table[node][destination]:
-    neighbor = i['neighbor']
-    from_point = min(node, neighbor)
-    to_point = max(node, neighbor)
-    
-    trail_cost = two_d_plane[from_point][to_point]['length']
-    pheramone = two_d_plane[from_point][to_point]['pheramone']
-
-    #Let the numerator be the current city to the power of alpha by the current 
-    numerator = (pow(( 1.0 / (trail_cost)), alpha)) * (pheramone)
-    prob = numerator / denominator
-    i['probability'] = round(prob, 2)
+      #Let the numerator be the current city to the power of alpha by the current 
+      numerator = (pow(( 1.0 / (trail_cost)), alpha)) * (pheramone)
+      prob = numerator / denominator
+      i['probability'] = round(prob, 2)
 
 
 '''
@@ -350,18 +348,16 @@ def move(ant, destination):
 
   #Create a list of the probability of moving to any on of the 
   #neighbors of the current node for the given destination.
-  for neighbor in pheramone_table[current_node][destination_node]:
+  for neighbor in pheramone_table[current_node][destination]:
     next_nodes.append(neighbor['probability'])
 
   neighbor = next_nodes.index(max(next_nodes))
-  next_city = pheramone_table[current_node][destination_node][neighbor]['neighbor']
+  next_city = pheramone_table[current_node][destination][neighbor]['neighbor']
   if(next_city in ant):
-    ant.append(next_city)
     ant_dead = True
   else:
-    ant.append(next_city)
     ant_dead = False
-  
+  ant.append(next_city)
   updateTrails(ant, ant_dead)
   return ant, ant_dead
 
@@ -379,7 +375,7 @@ def updateTrails(ant, ant_dead):
     included_cost = 1 / (1 + two_d_plane[from_point][to_point]['length'])
 
   two_d_plane[from_point][to_point]['pheramone'] = \
-          ((1 - evaporation_rate) * two_d_plane[from_point][to_point]['pheramone']) + included_cost
+         ((1 - evaporation_rate) * two_d_plane[from_point][to_point]['pheramone']) + included_cost
 
   #print(two_d_plane[from_point][to_point])
 
@@ -392,39 +388,73 @@ def updateTrailsGlobal(ant, degree_satisfied):
   if degree_satisfied:
     path_length = 0
     for vertex in range(len(ant) - 1):
-      from_point = ant[vertex]
-      to_point = ant[vertex + 1]
+      from_point = min(ant[vertex], ant[vertex+1])
+      to_point =   max(ant[vertex], ant[vertex+1])
+
       path_length += two_d_plane[from_point][to_point]['length']
       
     included_cost = 1 / (1 + path_length)
+  for vertex in two_d_plane:
+    for i in vertex:
+      if i != None:
+        i['pheramone'] = (1 - evaporation_rate) * i['pheramone']
+
   for vertex in range(len(ant) -1):
     from_point = min(ant[vertex], ant[vertex + 1])
-    to_point = max(ant[vertex], ant[vertex + 1])
-    two_d_plane[from_point][to_point]['pheramone'] = \
-          ((1 - evaporation_rate) * two_d_plane[from_point][to_point]['pheramone']) + included_cost
+    to_point =   max(ant[vertex], ant[vertex + 1])
 
+    two_d_plane[from_point][to_point]['pheramone'] += included_cost
+    two_d_plane[to_point][from_point]['pheramone'] += included_cost
 
 '''
 Build all of the ant trees based on the pheramone tables.
 '''
 def buildTree(tree, source, destination):
   current_node = source
+  prev_node = source
   visited = [current_node]
   while current_node != destination:
-    prev_node = current_node
     next_nodes = []
+    next_neighbors = []
     for i in pheramone_table[current_node][destination]:
-      if i['neighbor'] not in visited:
-        next_nodes.append(i['probability'])  
-      else:
-        next_nodes.append(-1)
-    neighbor = next_nodes.index(max(next_nodes))
-    current_node = pheramone_table[current_node][destination_node][neighbor]['neighbor']
-    #print(current_node)
-    visited.append(current_node)
-    tree.append((prev_node,current_node))
+      next_nodes.append(i['probability'])  
+      next_neighbors.append(i['neighbor'])
 
+    i = 0
+    while i < len(next_neighbors):
+      if next_neighbors[i] in visited:
+        next_neighbors.pop(i) 
+        next_nodes.pop(i)
+      else:
+        i += 1
+
+    if len(next_neighbors) != 0:
+      backtrack = 1
+      neighbor = next_nodes.index(max(next_nodes))
+      current_node = next_neighbors[neighbor]
+      visited.append(current_node)
+      if (prev_node, current_node) not in tree and (current_node, prev_node) not in tree:
+        tree.append((prev_node,current_node))
+
+    else:
+      if current_node not in visited:
+        visited.append(current_node)
+      current_node = visited[-backtrack]
+      backtrack += 1
+    
+    prev_node = current_node
   return tree
+
+'''
+Method used to find the total tour length
+'''
+def findCost(tree):
+  cost = 0
+  for i in tree:
+    cost += two_d_plane[i[0]][i[1]]['length']
+
+  return cost
+
 
 #Initialize all class parameters
 
@@ -435,13 +465,10 @@ local = 0
 globe = 0
 
   #Evaporation Rate.
-evaporation_rate = 0.5
+evaporation_rate = 0.05
 
   #contribution factor
 pheramone_factor = 1.0
-
-  #Random probability of the equation being discarded
-random_prob = 1
 
   #Trail intensity variable - open to fiddling and testing
 mew = 1.0
@@ -449,16 +476,16 @@ mew = 1.0
   #Weight of the Pheramone of the agorithm
 alpha = 5.0
 
-content = readFile("eil15.tsp")
+content = readFile("eil51.tsp")
 
 hannan_graph, count_map = makeHananGraph(content)
 
 hannan_graph = reduceHananGraph(hannan_graph)
 
-count_map, two_d_plane, necessary_points, node_degree, x1_coords, x2_coords, y1_coords, y2_coords  \
+count_map, initial_two_d_plane, necessary_points, node_degree, x1_coords, x2_coords, y1_coords, y2_coords  \
                      = graphToMatrix(hannan_graph, count_map)
 
-pheramone_table = createPheramoneTable(two_d_plane, node_degree)
+pheramone_table = createPheramoneTable(initial_two_d_plane, node_degree)
 '''
 Test for the creation of the pheramone table.
 
@@ -472,6 +499,7 @@ source_node = necessary_points[randint(0, len(necessary_points)-1)]
 necessary_points.remove(source_node)
 tree = []
 while len(necessary_points) > 0:
+  two_d_plane = initial_two_d_plane
   destination_node = necessary_points[randint(0, len(necessary_points)-1)]
   necessary_points.remove(destination_node)
   full_paths = []
@@ -496,8 +524,7 @@ while len(necessary_points) > 0:
         ant, ant_dead = move(ant, destination_node)
   
     updateTrailsGlobal(ant, True)
-    for node in ant:
-      updatePherTable(node, destination_node)
+    updatePherTable(destination_node)
     if at_destination:
       full_paths.append(ant)
   #print(source_node)
@@ -512,10 +539,12 @@ while len(necessary_points) > 0:
   #print(necessary_points)
   
   tree = buildTree(tree, source_node, destination_node)
-  print(tree)
+
+print(findCost(tree))
+print(tree)
 #plt.scatter(x1_coords, y1_coords, c='b')
 #plt.scatter(x2_coords, y2_coords, c='r')
-
+'''
 
 from_path_point = []
 to_path_point = []
@@ -542,4 +571,5 @@ for i in tree:
 #  plt.plot([from_path_point[point][0], to_path_point[point][0]], \
 #           [from_path_point[point][1], to_path_point[point][1]])
 
+'''
 #plt.show()
