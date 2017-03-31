@@ -467,14 +467,11 @@ globe = 0
   #Evaporation Rate.
 evaporation_rate = 0.05
 
-  #contribution factor
-pheramone_factor = 1.0
-
   #Trail intensity variable - open to fiddling and testing
 mew = 1.0
 
   #Weight of the Pheramone of the agorithm
-alpha = 5.0
+alpha = 2.0
 
 content = readFile("eil51.tsp")
 
@@ -522,8 +519,8 @@ while len(necessary_points) > 0:
       at_destination = ant[-1] == destination_node
       if( not at_destination):
         ant, ant_dead = move(ant, destination_node)
-  
-    updateTrailsGlobal(ant, True)
+    if not ant_dead:
+      updateTrailsGlobal(ant, True)
     updatePherTable(destination_node)
     if at_destination:
       full_paths.append(ant)
@@ -573,3 +570,4 @@ for i in tree:
 
 '''
 #plt.show()
+print('\a')

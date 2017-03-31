@@ -1,6 +1,9 @@
 #!/usr/bin/python
 
 #import matplotlib.pyplot as plt
+import winsound
+Freq = 2500 # Set Frequency To 2500 Hertz
+Dur = 1000 # Set Duration To 1000 ms == 1 second
 from random  import *
 import math
 ''' 
@@ -514,7 +517,7 @@ def tourLength():
 
 
 
-content = readFile("xqf131.tsp")
+content = readFile("a280.tsp")
 hannan_graph, count_map = makeHananGraph(content)
 
 hannan_graph = reduceHananGraph(hannan_graph)
@@ -583,3 +586,4 @@ for point in range(len(from_path_point)):
            [from_path_point[point][1], to_path_point[point][1]])
 '''
 #plt.show()
+winsound.Beep(Freq,Dur)

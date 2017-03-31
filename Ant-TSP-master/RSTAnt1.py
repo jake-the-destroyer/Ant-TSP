@@ -583,3 +583,4 @@ for point in range(len(from_path_point)):
            [from_path_point[point][1], to_path_point[point][1]])
 '''
 #plt.show()
+print('\a')
